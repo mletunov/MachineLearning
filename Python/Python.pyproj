@@ -34,7 +34,13 @@
     <Compile Include="cnnrnnVideo\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="dataset\dataset.py">
+    <Compile Include="dataset\HockeyDataset.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="dataset\tests.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="dataset\utils.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="dataset\__init__.py">
