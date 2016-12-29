@@ -27,11 +27,11 @@ def test_by_video():
 
     assert(len(result) == 2)
 
-    result_x, result_y = result[0]
+    result_x, result_y, _ = result[0]
     assert(np.array_equal(result_x, np.array([a1[0]])))
     assert(np.array_equal(result_y, np.array([a1[1]])))
 
-    result_x, result_y = result[1]
+    result_x, result_y, _ = result[1]
     assert(np.array_equal(result_x, np.array([a2[0]])))
     assert(np.array_equal(result_y, np.array([a2[1]])))
 
@@ -40,11 +40,11 @@ def test_frames_count(by_video):
 
     assert(len(result) == 2)
 
-    result_x, result_y = result[0]
+    result_x, result_y, _ = result[0]
     assert(np.array_equal(result_x, np.array([a1[0][0:3], a1[0][1:4]])))
     assert(np.array_equal(result_y, np.array([a1[1], a1[1]])))
         
-    result_x, result_y = result[1]
+    result_x, result_y, _ = result[1]
     assert(np.array_equal(result_x, np.array([a2[0]])))
     assert(np.array_equal(result_y, np.array([a2[1]])))
 
@@ -53,25 +53,25 @@ def test_batch_size(by_video):
 
     assert(len(result) == 3)
 
-    result_x, result_y = result[0]
+    result_x, result_y, _ = result[0]
     assert(np.array_equal(result_x, np.array([a1[0][0:2], a1[0][1:3]])))
     assert(np.array_equal(result_y, np.array([a1[1], a1[1]])))
             
     if by_video:
-        result_x, result_y = result[1]
+        result_x, result_y, _ = result[1]
         assert(np.array_equal(result_x, np.array([a1[0][2:4]])))
         assert(np.array_equal(result_y, np.array([a1[1]])))
             
-        result_x, result_y = result[2]
+        result_x, result_y, _ = result[2]
         assert(np.array_equal(result_x, np.array([a2[0][0:2], a2[0][1:3]])))
         assert(np.array_equal(result_y, np.array([a2[1], a2[1]])))
 
     else:
-        result_x, result_y = result[1]
+        result_x, result_y, _ = result[1]
         assert(np.array_equal(result_x, np.array([a1[0][2:4], a2[0][0:2]])))
         assert(np.array_equal(result_y, np.array([a1[1], a2[1]])))
             
-        result_x, result_y = result[2]
+        result_x, result_y, _ = result[2]
         assert(np.array_equal(result_x, np.array([a2[0][1:3]])))
         assert(np.array_equal(result_y, np.array([a2[1]])))
 

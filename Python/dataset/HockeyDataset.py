@@ -30,7 +30,7 @@ class HockeyDataset:
              assert(frame.shape == (288, 360, 3))
              return frame/255.
 
-        return utils.read_avi(os.path.join(self.dir, name), frame_func)
+        return utils.read_avi(utils.path_join(self.dir, name), frame_func)
 
     def read_tuple(self, name):
         y = 1 if name.startswith("fi") else 0
@@ -42,20 +42,21 @@ class HockeyDataset:
     # batch_size - epochs count in one batch
     def gen_dataset(self, names=None, by_video=True, frames_count=None, batch_size=None):
         batch = []
-        names = names or self.read_names()
+        if names is None:
+            names = self.read_names()
         
         def process(batch):
-            x, y = zip(*batch)
+            x, y, names = zip(*batch)
             batch.clear()
-            return np.array(x), np.array(y)
+            return np.array(x), np.array(y), np.array(names)
         
         for name in names:
             x, y = self.read_tuple(name)
             if not frames_count:
-                batch.append((x, y))
+                batch.append((x, y, name))
             else:
                 for shift in range(len(x) - frames_count + 1):
-                    batch.append((x[shift:shift + frames_count], y))
+                    batch.append((x[shift:shift + frames_count], y, name))
                     if batch_size and len(batch) >= batch_size:
                         yield process(batch)
             if len(batch) > 0 and (by_video or not batch_size):

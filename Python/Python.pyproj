@@ -24,12 +24,6 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="batchVideo\network.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="batchVideo\__init__.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="cnnrnnVideo\network.py" />
     <Compile Include="cnnrnnVideo\__init__.py">
       <SubType>Code</SubType>
@@ -46,13 +40,17 @@
     <Compile Include="dataset\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="fullVideo\network.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="fullVideo\__init__.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Hockey.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="learning\rnn\fullVideo.py" />
+    <Compile Include="learning\rnn\batchVideo.py" />
+    <Compile Include="learning\baseVideo.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="learning\rnn\cnnVideo.py" />
+    <Compile Include="learning\rnn\__init__.py" />
+    <Compile Include="learning\__init__.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Python.py" />
@@ -61,10 +59,11 @@
     <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\3.5" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="batchVideo\" />
     <Folder Include="cnnrnnVideo\" />
     <Folder Include="dataset\" />
-    <Folder Include="fullVideo\" />
+    <Folder Include="learning\" />
+    <Folder Include="learning\cnn\" />
+    <Folder Include="learning\rnn\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -32,6 +32,10 @@ def path_exists(path):
     import os
     return os.path.exists(path)
 
+def path_join(*paths):
+    import os
+    return os.path.join(*paths)
+
 def search_files(dir, ends=None):
     import os
 
@@ -42,7 +46,7 @@ def search_files(dir, ends=None):
 def read_avi(path, frame_func=None):
     import cv2
     
-    cap = cv2.VideoCapture(os.path.join(self.dir, name))
+    cap = cv2.VideoCapture(path)
     result = []
     frame_func = frame_func or (lambda frame: frame)
     while(cap.isOpened()):
@@ -54,7 +58,7 @@ def read_avi(path, frame_func=None):
     cap.release()
     return np.array(result)
 
-def split(self, array, frac):
+def split(array, frac):
     temp = np.array(array)    
     indices = np.random.permutation(temp.shape[0])
     part = (int)(temp.shape[0] * frac)
