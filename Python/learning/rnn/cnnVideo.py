@@ -4,7 +4,7 @@ import dataset.utils as utils
 from learning.baseVideo import HockeyNetwork
 
 class CnnVideoNetwork(HockeyNetwork):
-    def build(self, rnn_state=20, num_steps=30, learning_rate=1e-2):
+    def build(self, rnn_state=20, num_steps=30, learning_rate=1e-2, l2_loss=False):
         num_classes = 2
 
         tf.reset_default_graph()
@@ -35,28 +35,25 @@ class CnnVideoNetwork(HockeyNetwork):
                 conv3 = tf.nn.relu(tf.nn.conv2d(conv2, conv3_w, strides=[1, 2, 2, 1], padding="VALID") + conv3_b, name="conv")
                 pool3 = tf.nn.max_pool(conv3, ksize=[1, 3, 3, 1], strides=[1, 3, 3, 1], padding="VALID", name="pool")
             
-            with tf.name_scope("dense1"):
+            with tf.name_scope("flatten"):
                 size = np.prod(pool3.get_shape().as_list()[1:])
                 flatten_conv = tf.reshape(pool3, shape=(-1, size))
-                dense1_w = tf.Variable(tf.truncated_normal(shape=(size, 100), stddev=0.1), name="w")
-                dense1_b = tf.Variable(tf.zeros(shape=(100)), name="b")
-                dense1_out = tf.tanh(tf.matmul(flatten_conv, dense1_w) + dense1_b, name="dense")
 
         with tf.name_scope("rnn"):
-            size = dense1_out.get_shape().as_list()[-1]
-            rnn_inputs = tf.reshape(dense1_out, (-1, num_steps, size))
+            #size = dense1_out.get_shape().as_list()[-1]
+            rnn_inputs = tf.reshape(flatten_conv, (-1, num_steps, size))
             cell = tf.nn.rnn_cell.GRUCell(rnn_state)
             init_state = cell.zero_state(tf.shape(x)[0], dtype=tf.float32)
             rnn_outputs, final_state = tf.nn.dynamic_rnn(cell, rnn_inputs, initial_state=init_state)
             output = rnn_outputs[:,-1,:]
 
-            with tf.name_scope("dense2"):
-                dense2_w = tf.Variable(tf.truncated_normal([rnn_state, num_classes]), tf.float32, name="w")
-                dense2_b = tf.Variable(tf.zeros([num_classes]), tf.float32, name = "b")
-                dense2 = tf.add(tf.matmul(output, dense2_w), dense2_b, name="dense")
+            with tf.name_scope("dense"):
+                dense_w = tf.Variable(tf.truncated_normal([rnn_state, num_classes]), tf.float32, name="w")
+                dense_b = tf.Variable(tf.zeros([num_classes]), tf.float32, name = "b")
+                dense = tf.add(tf.matmul(output, dense2_w), dense2_b, name="out")
 
         with tf.name_scope("prediction"):
-            score = dense2
+            score = dense
             prediction = tf.cast(tf.arg_max(score, dimension=1), tf.int32)
             prediction_one_hot = tf.one_hot(prediction, depth=num_classes)
             prediction_total = tf.reduce_mean(prediction_one_hot, axis=0)
@@ -65,7 +62,11 @@ class CnnVideoNetwork(HockeyNetwork):
             accuracy = tf.reduce_mean(tf.cast(tf.equal(prediction, y), tf.float32))
 
         with tf.name_scope("train"):
-            loss = tf.nn.sparse_softmax_cross_entropy_with_logits(score, y)
+            if l2_loss:
+                loss = tf.nn.l2_loss(score - tf.one_hot(y, depth=num_classes))
+            else:
+                loss = tf.nn.sparse_softmax_cross_entropy_with_logits(score, y)
+            
             total_loss = tf.reduce_mean(loss)
             train_step = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(total_loss)
 

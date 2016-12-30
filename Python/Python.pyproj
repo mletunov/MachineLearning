@@ -24,10 +24,6 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="cnnrnnVideo\network.py" />
-    <Compile Include="cnnrnnVideo\__init__.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="dataset\HockeyDataset.py">
       <SubType>Code</SubType>
     </Compile>
@@ -41,6 +37,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Hockey.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="learning\launcher.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="learning\rnn\fullVideo.py" />
@@ -59,7 +58,6 @@
     <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\3.5" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="cnnrnnVideo\" />
     <Folder Include="dataset\" />
     <Folder Include="learning\" />
     <Folder Include="learning\cnn\" />
