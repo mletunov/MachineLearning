@@ -42,6 +42,8 @@
     <Compile Include="learning\launcher.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="learning\new\batchVideo.py" />
+    <Compile Include="learning\new\__init__.py" />
     <Compile Include="learning\rnn\fullVideo.py" />
     <Compile Include="learning\rnn\batchVideo.py" />
     <Compile Include="learning\baseVideo.py">
@@ -52,7 +54,9 @@
     <Compile Include="learning\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Python.py" />
+    <Compile Include="saver_test.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\3.5" />
@@ -60,7 +64,7 @@
   <ItemGroup>
     <Folder Include="dataset\" />
     <Folder Include="learning\" />
-    <Folder Include="learning\cnn\" />
+    <Folder Include="learning\new\" />
     <Folder Include="learning\rnn\" />
   </ItemGroup>
   <PropertyGroup>

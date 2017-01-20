@@ -70,6 +70,8 @@ class HockeyNetwork:
                 accuracies.extend(result[1])
 
                 if self.model_file:
+                    model_path, _ = utils.split_full_path(self.model_file)
+                    utils.make_sure_path_exists(model_path)
                     print("Save variables to", self.model_file)
                     saver.save(sess, self.model_file)
                 

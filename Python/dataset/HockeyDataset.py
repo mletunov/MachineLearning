@@ -28,7 +28,7 @@ class HockeyDataset:
     def read_avi(self, name):
         def frame_func(frame):
              assert(frame.shape == (288, 360, 3))
-             return frame/255.
+             return frame #frame/255.
 
         return utils.read_avi(utils.path_join(self.dir, name), frame_func)
 

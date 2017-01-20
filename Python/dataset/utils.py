@@ -32,9 +32,18 @@ def path_exists(path):
     import os
     return os.path.exists(path)
 
+def make_sure_path_exists(path):
+    import os
+    os.makedirs(path, exist_ok=True)
+
 def path_join(*paths):
     import os
     return os.path.join(*paths)
+
+def split_full_path(full_path):
+    import os
+    path, file = os.path.split(full_path)
+    return path, file
 
 def search_files(dir, ends=None):
     import os

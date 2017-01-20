@@ -4,19 +4,20 @@ import dataset.utils as utils
 from learning.baseVideo import HockeyNetwork
 
 class CnnVideoNetwork(HockeyNetwork):
-    def build(self, rnn_state=20, num_steps=30, learning_rate=1e-2, l2_loss=False):
+    def build(self, rnn_state=20, num_steps=30, learning_rate=1e-2, l2_loss=False, avg_result=False):
         num_classes = 2
+        frame_size = (288, 360, 3)
 
         tf.reset_default_graph()
         tf.set_random_seed(100)
 
         with tf.name_scope("input"):
             # num_steps sequence of frames: height x width x depth
-            x = tf.placeholder(tf.float32, (None, num_steps, 288, 360, 3))
+            x = tf.placeholder(tf.float32, (None, num_steps, *frame_size))
             # video class - fight (1) or not (0)
             y = tf.placeholder(tf.int32, (None,))
         
-            flatten_x = tf.reshape(x, (-1, 288, 360, 3))
+            flatten_x = tf.reshape(x, (-1, *frame_size))
 
         with tf.name_scope("cnn"):
             with tf.name_scope("conv1"):
@@ -39,21 +40,20 @@ class CnnVideoNetwork(HockeyNetwork):
                 size = np.prod(pool3.get_shape().as_list()[1:])
                 flatten_conv = tf.reshape(pool3, shape=(-1, size))
 
-        with tf.name_scope("rnn"):
-            #size = dense1_out.get_shape().as_list()[-1]
+        with tf.name_scope("rnn"):            
             rnn_inputs = tf.reshape(flatten_conv, (-1, num_steps, size))
             cell = tf.nn.rnn_cell.GRUCell(rnn_state)
             init_state = cell.zero_state(tf.shape(x)[0], dtype=tf.float32)
             rnn_outputs, final_state = tf.nn.dynamic_rnn(cell, rnn_inputs, initial_state=init_state)
-            output = rnn_outputs[:,-1,:]
+            output = tf.reshape(rnn_outputs, shape=(-1, rnn_state)) if avg_result else rnn_outputs[:,-1,:]
 
             with tf.name_scope("dense"):
                 dense_w = tf.Variable(tf.truncated_normal([rnn_state, num_classes]), tf.float32, name="w")
                 dense_b = tf.Variable(tf.zeros([num_classes]), tf.float32, name = "b")
-                dense = tf.add(tf.matmul(output, dense2_w), dense2_b, name="out")
+                dense = tf.add(tf.matmul(output, dense_w), dense_b, name="out")
 
         with tf.name_scope("prediction"):
-            score = dense
+            score = tf.reduce_mean(tf.reshape(dense, shape=(-1, num_steps, num_classes)), axis = 1) if avg_result else dense
             prediction = tf.cast(tf.arg_max(score, dimension=1), tf.int32)
             prediction_one_hot = tf.one_hot(prediction, depth=num_classes)
             prediction_total = tf.reduce_mean(prediction_one_hot, axis=0)

@@ -6,13 +6,14 @@ from learning.baseVideo import HockeyNetwork
 class BatchVideoNetwork(HockeyNetwork):
     def build(self, rnn_state=100, num_steps=30, learning_rate=1e-2):
         num_classes = 2
+        frame_size = (288, 360, 3)
 
         tf.reset_default_graph()
         tf.set_random_seed(100)
 
         with tf.name_scope("input"):
            # batch x epoch x height x width x channels; epoch length = num_steps so we can use multiple epochs in one batch
-            x = tf.placeholder(tf.float32, (None, num_steps, 288, 360, 3))
+            x = tf.placeholder(tf.float32, (None, num_steps, *frame_size))
             # video class - fight (1) or not (0)
             y = tf.placeholder(tf.int32, (None,))
 
