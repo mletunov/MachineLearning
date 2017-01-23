@@ -2,32 +2,36 @@ import matplotlib.pyplot as plt
 import dataset as ds
 import learning
 
+ds.run_tests()
+
+
 source_url = 'https://datastora.blob.core.windows.net/datasets/HockeyFights.zip'
 #source_url = 'http://visilab.etsii.uclm.es/personas/oscar/FightDetection/HockeyFights.zip'
 #source_url = 'https://github.com/marmelroy/Zip/raw/master/ZipTests/bb8.zip'
 source_dir = 'Data'
+dataset = ds.HockeyDataset(source_url, source_dir, max_size=4)
 
-ds.run_tests()
+class Mode:
+    RNN_SIMPLE = 0,
+    RNN_CNN = 1,
+    RNN_FULL = 2
 
-# use only 50 videos to train and test network
+mode = Mode.RNN_CNN
 
-dataset = ds.HockeyDataset(source_url, source_dir, max_size=2)
+if mode == Mode.RNN_CNN:    
+    model = learning.cnnVideo.CnnModel(checkpoint_dir='Models/cnn', seed=100).build(rnn_state=100, num_steps=30, avg_result=True)
+    trainer = learning.cnnVideo.CnnTrainer(model).build(learning_rate=1e-2)
+    losses, accuracies = trainer.train(dataset, epochs=5, batch_size=10)
 
+if mode == Mode.RNN_SIMPLE:
+    model = learning.batchVideo.BatchModel(checkpoint_dir='Models/batch', seed=100).build(rnn_state=50, num_steps=30)
+    trainer = learning.batchVideo.BatchTrainer(model).build(learning_rate=1e-2)
+    losses, accuracies = trainer.train(dataset, epochs=5, batch_size=10)
 
-model = learning.NewBatchVideoNetwork(checkpoint_dir='Models/batch2', seed=100).build(rnn_state=50, num_steps=30)
-trainer = learning.NewBatchVideoTrainer(model).build(learning_rate=1e-2)
-rr = trainer.train(dataset, epochs=5, batch_size=10)
-
-# full video network
-# network = ln.FullVideoNetwork()
-# graph = network.build(rnn_state=20)
-# losses, accuracies = network.train(graph, dataset, 2)
-
-# batch video network
-#network = learning.BatchVideoNetwork(model_file="Models/batch/data")
-network = learning.CnnVideoNetwork(model_file="Models/cnnAvg/data")
-graph = network.build(rnn_state=50, num_steps=30, l2_loss=False, avg_result=True)
-losses, accuracies = network.train(graph, dataset, epochs=5, batch_size=10)
+if mode == Mode.RNN_FULL:
+    network = learning.FullVideoNetwork()
+    graph = network.build(rnn_state=20)
+    losses, accuracies = network.train(graph, dataset, 2)
 
 plt.plot(losses)
 plt.plot(accuracies)

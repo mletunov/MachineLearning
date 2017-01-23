@@ -1,6 +1,4 @@
-from learning.rnn.fullVideo import FullVideoNetwork
-from learning.rnn.batchVideo import BatchVideoNetwork
-from learning.rnn.cnnVideo import CnnVideoNetwork
+from learning.obsolete.fullVideo import FullVideoNetwork
 
-from learning.new.batchVideo import BatchVideoNetwork as NewBatchVideoNetwork
-from learning.new.batchVideo import BatchVideoTrainer as NewBatchVideoTrainer
+import learning.rnn.batchVideo as batchVideo
+import learning.rnn.cnnVideo as cnnVideo

@@ -39,22 +39,18 @@
     <Compile Include="Hockey.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="learning\launcher.py">
+    <Compile Include="learning\rnn\baseNetwork.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="learning\new\batchVideo.py" />
-    <Compile Include="learning\new\__init__.py" />
-    <Compile Include="learning\rnn\fullVideo.py" />
     <Compile Include="learning\rnn\batchVideo.py" />
+    <Compile Include="learning\rnn\cnnVideo.py" />
+    <Compile Include="learning\rnn\__init__.py" />
+    <Compile Include="learning\obsolete\fullVideo.py" />
     <Compile Include="learning\baseVideo.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="learning\rnn\cnnVideo.py" />
-    <Compile Include="learning\rnn\__init__.py" />
+    <Compile Include="learning\obsolete\__init__.py" />
     <Compile Include="learning\__init__.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="saver_test.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
@@ -64,8 +60,8 @@
   <ItemGroup>
     <Folder Include="dataset\" />
     <Folder Include="learning\" />
-    <Folder Include="learning\new\" />
     <Folder Include="learning\rnn\" />
+    <Folder Include="learning\obsolete\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
