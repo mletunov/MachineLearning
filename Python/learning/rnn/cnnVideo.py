@@ -103,7 +103,7 @@ class CnnTrainer(baseNetwork.BaseTrainer):
         if self.model.seed:
             np.random.seed(self.model.seed)
         
-        train_names, test_names = utils.split(dataset.read_names(), frac = 0.5)
+        train_names, test_names = utils.split(dataset.read_names(), frac = 0.9)
         train_dataset = lambda: dataset.gen_dataset(train_names, by_video=False, frames_count=self.model.num_steps, batch_size=batch_size)
         test_dataset = lambda: dataset.gen_dataset(test_names, by_video=True, frames_count=self.model.num_steps, batch_size=batch_size)
 
