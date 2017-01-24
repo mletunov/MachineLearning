@@ -121,7 +121,7 @@ class BaseTrainer():
                 last_step = int(str.split(self.model.saver.last_checkpoints[-1], '-')[-1]) if len(self.model.saver.last_checkpoints) > 0 else 0
                 self.model.save(sess, global_step=last_step + 1)
                 for idx, summary in enumerate(train_summaries):
-                    train_logger.add_summary(summary, (last_step + (idx + 1) / len(train_summaries)))
+                    train_logger.add_summary(summary, int((last_step + (idx + 1) / len(train_summaries)) * 10))
 
                 # test
                 def test_func(step, x, y, names):
@@ -138,8 +138,45 @@ class BaseTrainer():
 
                 test_losses, test_accuracies, test_summaries = indicator_loop(dataset=test_dataset(), step_func=test_func, total_func=test_total)
                 for idx, summary in enumerate(test_summaries):
-                    test_logger.add_summary(summary, (last_step + (idx + 1) / len(test_summaries)))
+                    test_logger.add_summary(summary, int((last_step + (idx + 1) / len(test_summaries)) * 10))
 
             return losses, accuracies
 
         return self.model.execute(train_function)
+
+class Predictor:
+    def __init__(self, model, **kwargs):
+        self._model = model
+        return super().__init__(**kwargs)
+
+    def predict(self, dataset, batch_size = 20):
+        names = dataset.read_names()
+        gen_dataset = lambda: dataset.gen_dataset(names, by_video=True, frames_count=self._model.num_steps, batch_size=batch_size)
+
+        def predict_func(sess):
+            result = {}
+            prediction = []
+            current = None
+
+            def add_result(name, prediction, expected):
+                score = np.mean(prediction)
+                result[name] = {'score': score, 'expected': expected, 'prediction': 1 if score >= 0.5 else 0}
+                result[name]['text'] = "fight" if result[name]['prediction'] == 1 else "no fight"
+                print("{3:2} {0}: score - {1:.5f}, prediction - {2}".format(name, result[name]['score'], result[name]['text'], len(result)))
+
+            for x, y, names in gen_dataset():
+                if current and names[0] != current:
+                    add_result(current, prediction, expected)
+                    prediction = []
+
+                current = names[0]
+                prediction.extend(self._model.predict(x, sess))
+                expected = y[0]
+
+            add_result(current, prediction, expected)
+            return result
+
+        return self._model.execute(predict_func)
+
+    def accuracy(self, prediction):
+         return np.mean([1 if v['expected'] == v['prediction'] else 0 for _, v in prediction.items()])
