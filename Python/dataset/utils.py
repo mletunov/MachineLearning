@@ -1,6 +1,6 @@
 import numpy as np
 
-def download(url):    
+def download(url):
     import requests
 
     response = requests.get(url, stream=True)
@@ -22,7 +22,7 @@ def download(url):
 def unzip(raw_data, dir):
     import io
     import zipfile
-    
+
     zip_object = io.BytesIO(raw_data)
     zip_file = zipfile.ZipFile(zip_object)
     zip_file.extractall(dir)
@@ -54,7 +54,7 @@ def search_files(dir, ends=None):
 
 def read_avi(path, frame_func=None):
     import cv2
-    
+
     cap = cv2.VideoCapture(path)
     result = []
     frame_func = frame_func or (lambda frame: frame)
@@ -62,13 +62,13 @@ def read_avi(path, frame_func=None):
         ret, frame = cap.read()
         if not ret:
             break
-                        
+
         result.append(frame_func(frame))
     cap.release()
     return np.array(result)
 
 def split(array, frac):
-    temp = np.array(array)    
+    temp = np.array(array)
     indices = np.random.permutation(temp.shape[0])
     part = (int)(temp.shape[0] * frac)
     part1_idx, part2_idx = indices[:part], indices[part:]

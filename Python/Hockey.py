@@ -18,7 +18,7 @@ class Mode:
 
 mode = Mode.RNN_CNN
 
-if mode == Mode.RNN_CNN:    
+if mode == Mode.RNN_CNN:
     model = learning.cnnVideo.CnnModel(checkpoint_dir='Models/cnn', seed=100).build(rnn_state=100, num_steps=30, avg_result=True)
     trainer = learning.cnnVideo.CnnTrainer(model).build(learning_rate=1e-2)
     losses, accuracies = trainer.train(dataset, epochs=5, batch_size=20)

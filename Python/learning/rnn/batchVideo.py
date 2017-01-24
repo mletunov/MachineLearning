@@ -38,7 +38,7 @@ class BatchModel(baseNetwork.BaseModel):
             with tf.name_scope("prediction"):
                 score = tf.reduce_mean(tf.reshape(dense, shape=(-1, num_steps, self.num_classes)), axis = 1) if avg_result else dense
                 prediction = tf.cast(tf.arg_max(score, dimension=1), tf.int32)
-            
+
             self.input = x
             self.score = score
             self.prediction = prediction
@@ -49,22 +49,22 @@ class BatchModel(baseNetwork.BaseModel):
 class BatchTrainer(baseNetwork.BaseTrainer):
     def __init__(self, model, **kwargs):
         return super().__init__(model, **kwargs)
-    
+
     def build(self, learning_rate=1e-2):
         with self.model.graph.as_default():
             with tf.name_scope("input"):
                 # video class - fight (1) or not (0)
                 y = tf.placeholder(tf.int32, (None,))
 
-            with tf.name_scope("accuracy"):       
+            with tf.name_scope("accuracy"):
                 accuracy = tf.reduce_mean(tf.cast(tf.equal(self.model.prediction, y), tf.float32), name="accuracy")
                 tf.summary.scalar("accuracy", accuracy)
-        
+
             with tf.name_scope("train"):
                 loss = tf.nn.sparse_softmax_cross_entropy_with_logits(self.model.score, y)
                 total_loss = tf.reduce_mean(loss, name="loss")
                 tf.summary.scalar("loss", total_loss)
-                train_step = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(total_loss)                       
+                train_step = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(total_loss)
 
             self.expected = y
             self.train_step = train_step
@@ -80,5 +80,5 @@ class BatchTrainer(baseNetwork.BaseTrainer):
         train_names, test_names = utils.split(dataset.read_names(), frac = 0.9)
         train_dataset = lambda: dataset.gen_dataset(train_names, by_video=False, frames_count=self.model.num_steps, batch_size=batch_size)
         test_dataset = lambda: dataset.gen_dataset(test_names, by_video=True, frames_count=self.model.num_steps, batch_size=batch_size)
-        
+
         return super()._train(epochs, train_dataset, test_dataset)

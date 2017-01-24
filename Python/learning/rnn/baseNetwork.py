@@ -14,10 +14,10 @@ class BaseModel():
     def save(self, sess, checkpoint_dir=None, global_step=None):
         if not checkpoint_dir:
             checkpoint_dir = self._checkpoint_dir
-            
+
         if not checkpoint_dir:
             raise ValueError("checkpoint directory is not specified")
-        
+
         path = self.saver.save(sess, utils.path_join(checkpoint_dir, 'model'), global_step=global_step)
         print("Saved graph with variables to", path)
         return path
@@ -30,7 +30,7 @@ class BaseModel():
                 print("Loading variables from", self.saver.last_checkpoints[-1])
                 self.saver.restore(sess, self.saver.last_checkpoints[-1])
                 return
-        
+
         print("Initializing variables randomly")
         sess.run(self.init)
 
@@ -51,7 +51,7 @@ class BaseTrainer():
     def __init__(self, model, **kwargs):
         self.model = model
         return super().__init__(**kwargs)
-    
+
     @staticmethod
     def _indicators(loop):
         def wrapper(*args, total_func, **kwargs):
@@ -66,7 +66,7 @@ class BaseTrainer():
                 count_loss += loss
                 total_accuracy += accuracy
                 count_accuracy += accuracy
-                    
+
                 if (idx + 1) % count_steps == 0:
                     losses.append(count_loss/count_steps)
                     accuracies.append(count_accuracy/count_steps)
@@ -76,7 +76,7 @@ class BaseTrainer():
             total_func(total_loss, total_accuracy, len(result))
             return losses, accuracies, summaries
         return wrapper
-        
+
     @staticmethod
     def _loop(dataset, step_func, total_func):
         losses, accuracies, summaries = [], [], []
@@ -86,13 +86,13 @@ class BaseTrainer():
             losses.append(loss)
             accuracies.append(accuracy)
             summaries.append(summary)
-            
+
         return losses, accuracies, summaries
 
     def _train(self, epochs, train_dataset, test_dataset):
         def train_function(sess):
             sess.run(self.init)
-            
+
             losses, accuracies = [], []
             indicator_loop = BaseTrainer._indicators(BaseTrainer._loop)
             all_summary = tf.summary.merge_all()
@@ -100,12 +100,12 @@ class BaseTrainer():
             test_logger = tf.summary.FileWriter(utils.path_join(self.model._checkpoint_dir, "test"), sess.graph)
             for epoch in range(epochs):
                 print("Epoch {0}.".format(epoch + 1))
-                
+
                 # train
                 def train_func(step, x, y, names):
                     feed_dict = {self.model.input: x, self.expected: y}
                     loss, accuracy, prediction, summary, _ = sess.run([self.loss, self.accuracy, self.model.prediction, all_summary, self.train_step], feed_dict=feed_dict)
-                    
+
                     print(" " * LINE_SIZE, end="\r")
                     print("Train: step - {0:2}, loss - {1:.5f}, accuracy - {2:.5f}, names - {3}, prediction - {4}, y - {5}".format(step, loss, accuracy, np.unique(names), prediction, y), end="\r", flush=True)
                     return loss, accuracy, summary
@@ -117,21 +117,21 @@ class BaseTrainer():
                 train_losses, train_accuracies, train_summaries = indicator_loop(dataset=train_dataset(), step_func=train_func, total_func=train_total)
                 losses.extend(train_losses)
                 accuracies.extend(train_accuracies)
-                
-                last_step = int(str.split(self.model.saver.last_checkpoints[-1], '-')[-1]) if len(self.model.saver.last_checkpoints) > 0 else 0   
+
+                last_step = int(str.split(self.model.saver.last_checkpoints[-1], '-')[-1]) if len(self.model.saver.last_checkpoints) > 0 else 0
                 self.model.save(sess, global_step=last_step + 1)
                 for idx, summary in enumerate(train_summaries):
                     train_logger.add_summary(summary, (last_step + (idx + 1) / len(train_summaries)))
-                
+
                 # test
                 def test_func(step, x, y, names):
                     feed_dict = {self.model.input: x, self.expected: y}
                     loss, accuracy, prediction, summary = sess.run([self.loss, self.accuracy, self.model.prediction, all_summary], feed_dict=feed_dict)
-                
+
                     print(" " * LINE_SIZE, end="\r")
                     print("Test: step - {0:2}, loss - {1:.5f}, accuracy - {2:.5f}, name - {3}, prediction - {4}, y - {5}".format(step, loss, accuracy, np.unique(names), prediction, y), end="\r", flush=True)
                     return loss, accuracy, summary
-                
+
                 def test_total(total_loss, total_acc, steps):
                     print(" " * LINE_SIZE, end="\r")
                     print("Test: loss - {0:.5f}, accuracy - {1:.5f}".format(total_loss/steps, total_acc/steps), flush=True)

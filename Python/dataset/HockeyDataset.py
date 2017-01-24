@@ -6,23 +6,23 @@ class HockeyDataset:
         self.url = source_url
         self.dir = source_dir
         self.max_size = max_size
-    
+
     def read_names(self, shuffle=False):
         if not utils.path_exists(self.dir):
             data = utils.download(self.url)
             utils.unzip(data, self.dir)
-        
-        result = list(utils.search_files(self.dir, ".avi"))       
-        
+
+        result = list(utils.search_files(self.dir, ".avi"))
+
         if self.max_size and self.max_size < len(result):
             size = self.max_size // 2
             temp = result[:size]
             temp.extend(result[-(self.max_size - size):])
             result = temp
-        
+
         if shuffle:
             np.random.shuffle(result)
-    
+
         return result
 
     def read_avi(self, name):
@@ -44,12 +44,12 @@ class HockeyDataset:
         batch = []
         if names is None:
             names = self.read_names()
-        
+
         def process(batch):
             x, y, names = zip(*batch)
             batch.clear()
             return np.array(x), np.array(y), np.array(names)
-        
+
         for name in names:
             x, y = self.read_tuple(name)
             if not frames_count:
