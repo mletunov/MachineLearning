@@ -24,7 +24,7 @@ if mode == Mode.RNN_CNN:
     losses, accuracies = trainer.train(dataset, epochs=5, batch_size=20)
 
 if mode == Mode.RNN_SIMPLE:
-    model = learning.batchVideo.BatchModel(checkpoint_dir='Models/batch', seed=100).build(rnn_state=50, num_steps=30)
+    model = learning.batchVideo.BatchModel(checkpoint_dir='Models/batch', seed=100).build(rnn_state=50, num_steps=30, avg_result=True)
     trainer = learning.batchVideo.BatchTrainer(model).build(learning_rate=1e-2)
     losses, accuracies = trainer.train(dataset, epochs=5, batch_size=20)
 

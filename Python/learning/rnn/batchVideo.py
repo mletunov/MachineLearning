@@ -8,7 +8,7 @@ class BatchModel(baseNetwork.BaseModel):
         self.seed = seed
         return super().__init__(checkpoint_dir)
 
-    def build(self, rnn_state=100, num_steps=30):
+    def build(self, rnn_state=100, num_steps=30, avg_result=False):
         self.graph = tf.Graph()
         with self.graph.as_default():
             self.num_classes = 2
@@ -28,7 +28,7 @@ class BatchModel(baseNetwork.BaseModel):
                 cell = tf.nn.rnn_cell.GRUCell(rnn_state)
                 init_state = cell.zero_state(tf.shape(flatten_x)[0], dtype=tf.float32)
                 rnn_outputs, final_state = tf.nn.dynamic_rnn(cell, rnn_inputs, initial_state=init_state)
-                output = rnn_outputs[:,-1,:]
+                output = tf.reshape(rnn_outputs, shape=(-1, rnn_state)) if avg_result else rnn_outputs[:,-1,:]
 
             with tf.name_scope("dense"):
                 dense_w = tf.Variable(tf.truncated_normal([rnn_state, self.num_classes]), tf.float32, name="w")
@@ -36,7 +36,7 @@ class BatchModel(baseNetwork.BaseModel):
                 dense = tf.add(tf.matmul(output, dense_w), dense_b, name="dense")
 
             with tf.name_scope("prediction"):
-                score = dense
+                score = tf.reduce_mean(tf.reshape(dense, shape=(-1, num_steps, self.num_classes)), axis = 1) if avg_result else dense
                 prediction = tf.cast(tf.arg_max(score, dimension=1), tf.int32)
             
             self.input = x
