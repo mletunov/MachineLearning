@@ -8,7 +8,7 @@ class CnnModel(baseNetwork.BaseModel):
         self.seed = seed
         return super().__init__(checkpoint_dir)
 
-    def build(self, rnn_state=20, num_steps=30, avg_result=False):
+    def build(self, rnn_state=20, num_steps=30, avg_result=False, batch_norm=False, dropout=False):
         self.graph = tf.Graph()
         with self.graph.as_default():
             self.num_classes = 2
@@ -21,6 +21,8 @@ class CnnModel(baseNetwork.BaseModel):
             with tf.name_scope("input"):
                 # num_steps sequence of frames: height x width x depth
                 x = tf.placeholder(tf.float32, (None, num_steps, *frame_size))
+                if dropout:
+                    self.keep_prob = tf.placeholder(tf.float32) #dropout (keep probability)
 
                 flatten_x = tf.reshape(x, (-1, *frame_size))
 
@@ -29,6 +31,15 @@ class CnnModel(baseNetwork.BaseModel):
                     conv1_w = tf.Variable(tf.truncated_normal(shape=(5, 5, 3, 16), stddev=0.1), name="w")
                     conv1_b = tf.Variable(tf.zeros(shape=(16)), name="b")
                     conv1 = tf.nn.relu(tf.nn.conv2d(flatten_x, conv1_w, strides=[1, 2, 2, 1], padding="VALID") + conv1_b, name="conv")
+                
+                if batch_norm:
+                    with tf.name_scope("batch_norm"):
+                        batch_mean, batch_var = tf.nn.moments(conv1,[0])
+                        scale = tf.Variable(tf.ones(tf.shape(batch_mean)))
+                        beta = tf.Variable(tf.zeros(tf.shape(batch_mean)))
+                        # Small epsilon value for the BN transform
+                        epsilon = 1e-3
+                        conv1 = tf.nn.batch_normalization(conv1, batch_mean, batch_var, beta, scale, epsilon)
 
                 with tf.name_scope("conv2"):
                     conv2_w = tf.Variable(tf.truncated_normal(shape=(7, 7, 16, 16), stddev=0.1), name="w")
@@ -44,6 +55,9 @@ class CnnModel(baseNetwork.BaseModel):
                 with tf.name_scope("flatten"):
                     size = np.prod(pool3.get_shape().as_list()[1:])
                     flatten_conv = tf.reshape(pool3, shape=(-1, size))
+
+            if dropout:
+                flatten_conv = tf.nn.dropout(flatten_conv, self.keep_prob, name="dropout")
 
             with tf.name_scope("rnn"):
                 rnn_inputs = tf.reshape(flatten_conv, (-1, num_steps, size))
@@ -99,7 +113,7 @@ class CnnTrainer(baseNetwork.BaseTrainer):
             self.init = [var.initializer for var in tf.global_variables() if var.name.startswith('train')]
         return self
 
-    def train(self, dataset, epochs, batch_size=20):
+    def train(self, dataset, epochs, batch_size=20, dropout=0.75):
         if self.model.seed:
             np.random.seed(self.model.seed)
 
@@ -107,4 +121,4 @@ class CnnTrainer(baseNetwork.BaseTrainer):
         train_dataset = lambda: dataset.gen_dataset(train_names, by_video=False, frames_count=self.model.num_steps, batch_size=batch_size)
         test_dataset = lambda: dataset.gen_dataset(test_names, by_video=True, frames_count=self.model.num_steps, batch_size=batch_size)
 
-        return super()._train(epochs, train_dataset, test_dataset)
+        return super()._train(epochs, train_dataset, test_dataset, dropout)

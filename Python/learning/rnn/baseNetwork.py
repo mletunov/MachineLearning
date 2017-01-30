@@ -41,6 +41,8 @@ class BaseModel():
     def predict(self, x, sess=None):
         def predict_impl(sess):
             feed_dict={self.input: x if hasattr(x, '__len__') else [x]}
+            if hasattr(self, "keep_prob"):
+                feed_dict[self.keep_prob] = 1.0
             prediction = sess.run(self.prediction, feed_dict=feed_dict)
             return prediction
 
@@ -89,7 +91,7 @@ class BaseTrainer():
 
         return losses, accuracies, summaries
 
-    def _train(self, epochs, train_dataset, test_dataset):
+    def _train(self, epochs, train_dataset, test_dataset, dropout=0.75):
         def train_function(sess):
             sess.run(self.init)
 
@@ -104,6 +106,9 @@ class BaseTrainer():
                 # train
                 def train_func(step, x, y, names):
                     feed_dict = {self.model.input: x, self.expected: y}
+                    if hasattr(self.model, "keep_prob"):
+                        feed_dict[self.model.keep_prob] = dropout
+
                     loss, accuracy, prediction, summary, _ = sess.run([self.loss, self.accuracy, self.model.prediction, all_summary, self.train_step], feed_dict=feed_dict)
 
                     print(" " * LINE_SIZE, end="\r")
@@ -126,6 +131,9 @@ class BaseTrainer():
                 # test
                 def test_func(step, x, y, names):
                     feed_dict = {self.model.input: x, self.expected: y}
+                    if hasattr(self.model, "keep_prob"):
+                        feed_dict[self.model.keep_prob] = 1.0
+
                     loss, accuracy, prediction, summary = sess.run([self.loss, self.accuracy, self.model.prediction, all_summary], feed_dict=feed_dict)
 
                     print(" " * LINE_SIZE, end="\r")
