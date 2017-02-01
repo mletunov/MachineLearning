@@ -100,7 +100,7 @@ class BaseTrainer():
             test_logger = tf.summary.FileWriter(utils.path_join(self.model._checkpoint_dir, "test"), sess.graph)
 
             @utils.timeit
-            def epoch_func(epoch):            
+            def epoch_func(epoch):
                 print("Epoch {0}.".format(epoch + 1))
 
                 # train
@@ -114,8 +114,8 @@ class BaseTrainer():
 
                     print("Train step - {0:2}: loss - {1:.5f}, accuracy - {2:.5f}, names - {3}, prediction - {4}, y - {5}".format(step, loss, accuracy, np.unique(names), prediction, y), flush=True)
                     return loss, accuracy, summary
-                
-                def train_total(total_loss, total_acc, steps):                   
+
+                def train_total(total_loss, total_acc, steps):
                     print("----- Train: loss - {0:.5f}, accuracy - {1:.5f}".format(total_loss/steps, total_acc/steps), flush=True)
 
                 train_losses, train_accuracies, train_summaries = indicator_loop(dataset=train_dataset(), step_func=train_func, total_func=train_total)
@@ -145,7 +145,7 @@ class BaseTrainer():
                 test_losses, test_accuracies, test_summaries = indicator_loop(dataset=test_dataset(), step_func=test_func, total_func=test_total)
                 for idx, summary in enumerate(test_summaries):
                     test_logger.add_summary(summary, int((last_step + (idx + 1) / len(test_summaries)) * 10))
-            
+
             for epoch in range(epochs):
                 epoch_func(epoch)
 

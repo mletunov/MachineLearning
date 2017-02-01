@@ -75,12 +75,12 @@ def split(array, frac):
     return temp[part1_idx], temp[part2_idx]
 
 def timeit(method):
-    import time 
+    import time
     def timed(*args, **kw):
         ts = time.time()
         result = method(*args, **kw)
         te = time.time()
- 
+
         print('%r %2.2f sec' % (method.__name__, te-ts))
         return result
 

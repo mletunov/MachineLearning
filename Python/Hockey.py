@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import dataset as ds
 import learning
 
