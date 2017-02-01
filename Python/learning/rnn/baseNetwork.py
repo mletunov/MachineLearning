@@ -2,8 +2,6 @@ import tensorflow as tf
 import numpy as np
 import dataset.utils as utils
 
-LINE_SIZE = 180
-
 class BaseModel():
     """ base model for Hockey dataset """
     def __init__(self, checkpoint_dir=None, **kwargs):
@@ -100,10 +98,13 @@ class BaseTrainer():
             all_summary = tf.summary.merge_all()
             train_logger = tf.summary.FileWriter(utils.path_join(self.model._checkpoint_dir, "train"), sess.graph)
             test_logger = tf.summary.FileWriter(utils.path_join(self.model._checkpoint_dir, "test"), sess.graph)
-            for epoch in range(epochs):
+
+            @utils.timeit
+            def epoch_func(epoch):            
                 print("Epoch {0}.".format(epoch + 1))
 
                 # train
+                @utils.timeit
                 def train_func(step, x, y, names):
                     feed_dict = {self.model.input: x, self.expected: y}
                     if hasattr(self.model, "keep_prob"):
@@ -111,13 +112,11 @@ class BaseTrainer():
 
                     loss, accuracy, prediction, summary, _ = sess.run([self.loss, self.accuracy, self.model.prediction, all_summary, self.train_step], feed_dict=feed_dict)
 
-                    print(" " * LINE_SIZE, end="\r")
-                    print("Train: step - {0:2}, loss - {1:.5f}, accuracy - {2:.5f}, names - {3}, prediction - {4}, y - {5}".format(step, loss, accuracy, np.unique(names), prediction, y), end="\r", flush=True)
+                    print("Train step - {0:2}: loss - {1:.5f}, accuracy - {2:.5f}, names - {3}, prediction - {4}, y - {5}".format(step, loss, accuracy, np.unique(names), prediction, y), flush=True)
                     return loss, accuracy, summary
                 
-                def train_total(total_loss, total_acc, steps):
-                    print(" " * LINE_SIZE, end="\r")
-                    print("Train: loss - {0:.5f}, accuracy - {1:.5f}".format(total_loss/steps, total_acc/steps), flush=True)
+                def train_total(total_loss, total_acc, steps):                   
+                    print("----- Train: loss - {0:.5f}, accuracy - {1:.5f}".format(total_loss/steps, total_acc/steps), flush=True)
 
                 train_losses, train_accuracies, train_summaries = indicator_loop(dataset=train_dataset(), step_func=train_func, total_func=train_total)
                 losses.extend(train_losses)
@@ -129,6 +128,7 @@ class BaseTrainer():
                     train_logger.add_summary(summary, int((last_step + (idx + 1) / len(train_summaries)) * 10))
 
                 # test
+                @utils.timeit
                 def test_func(step, x, y, names):
                     feed_dict = {self.model.input: x, self.expected: y}
                     if hasattr(self.model, "keep_prob"):
@@ -136,17 +136,18 @@ class BaseTrainer():
 
                     loss, accuracy, prediction, summary = sess.run([self.loss, self.accuracy, self.model.prediction, all_summary], feed_dict=feed_dict)
 
-                    print(" " * LINE_SIZE, end="\r")
-                    print("Test: step - {0:2}, loss - {1:.5f}, accuracy - {2:.5f}, name - {3}, prediction - {4}, y - {5}".format(step, loss, accuracy, np.unique(names), prediction, y), end="\r", flush=True)
+                    print("Test step - {0:2}: loss - {1:.5f}, accuracy - {2:.5f}, name - {3}, prediction - {4}, y - {5}".format(step, loss, accuracy, np.unique(names), prediction, y), flush=True)
                     return loss, accuracy, summary
 
                 def test_total(total_loss, total_acc, steps):
-                    print(" " * LINE_SIZE, end="\r")
-                    print("Test: loss - {0:.5f}, accuracy - {1:.5f}".format(total_loss/steps, total_acc/steps), flush=True)
+                    print("----- Test: loss - {0:.5f}, accuracy - {1:.5f}".format(total_loss/steps, total_acc/steps), flush=True)
 
                 test_losses, test_accuracies, test_summaries = indicator_loop(dataset=test_dataset(), step_func=test_func, total_func=test_total)
                 for idx, summary in enumerate(test_summaries):
                     test_logger.add_summary(summary, int((last_step + (idx + 1) / len(test_summaries)) * 10))
+            
+            for epoch in range(epochs):
+                epoch_func(epoch)
 
             return losses, accuracies
 

@@ -73,3 +73,15 @@ def split(array, frac):
     part = (int)(temp.shape[0] * frac)
     part1_idx, part2_idx = indices[:part], indices[part:]
     return temp[part1_idx], temp[part2_idx]
+
+def timeit(method):
+    import time 
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+ 
+        print('%r %2.2f sec' % (method.__name__, te-ts))
+        return result
+
+    return timed
