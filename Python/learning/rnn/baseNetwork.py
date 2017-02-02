@@ -33,7 +33,9 @@ class BaseModel():
         sess.run(self.init)
 
     def execute(self, func):
-        with tf.Session(graph=self.graph) as sess:
+        gpu_options = tf.GPUOptions(allow_growth=True)
+        config = tf.ConfigProto(gpu_options=gpu_options)
+        with tf.Session(graph=self.graph, config=config) as sess:
             self.load(sess)
             return func(sess)
     def predict(self, x, sess=None):
