@@ -1,5 +1,5 @@
-from learning.obsolete.fullVideo import FullVideoNetwork
-
-import learning.rnn.batchVideo as batchVideo
+import learning.rnn.fullVideo as fullVideo
+import learning.rnn.simpleVideo as simpleVideo
 import learning.rnn.cnnVideo as cnnVideo
-from learning.rnn.baseNetwork import Predictor
+
+from learning.baseNetwork import Predictor

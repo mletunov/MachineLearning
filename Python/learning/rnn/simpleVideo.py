@@ -1,9 +1,9 @@
 import numpy as np
 import tensorflow as tf
 import dataset.utils as utils
-from learning.rnn import baseNetwork
+from learning import baseNetwork
 
-class BatchModel(baseNetwork.BaseModel):
+class SimpleModel(baseNetwork.BaseModel):
     def __init__(self, checkpoint_dir=None, seed=None):
         self.seed = seed
         return super().__init__(checkpoint_dir)
@@ -46,7 +46,7 @@ class BatchModel(baseNetwork.BaseModel):
             self.init = tf.global_variables_initializer()
         return self
 
-class BatchTrainer(baseNetwork.BaseTrainer):
+class SimpleTrainer(baseNetwork.BaseTrainer):
     def __init__(self, model, **kwargs):
         return super().__init__(model, **kwargs)
 

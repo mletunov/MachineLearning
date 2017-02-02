@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 import dataset.utils as utils
-from learning.rnn import baseNetwork
+from learning import baseNetwork
 
 class CnnModel(baseNetwork.BaseModel):
     def __init__(self, checkpoint_dir=None, seed=None):
