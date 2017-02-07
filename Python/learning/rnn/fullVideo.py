@@ -78,8 +78,13 @@ class FullTrainer(baseNetwork.BaseTrainer):
         if self.model.seed:
             np.random.seed(self.model.seed)
 
+        # split train and test datasets constantly during whole training 9:1
         train_names, test_names = utils.split(dataset.read_names(), frac = 0.9)
-        train_dataset = lambda: dataset.gen_dataset(train_names, by_video=True)
+
+        # shuffle training dataset before each epoch
+        train_dataset = lambda: dataset.gen_dataset(utils.shuffle(train_names), by_video=True)
+
+        # it doesn't matter to shuffle test dataset because it will not take any impact on result
         test_dataset = lambda: dataset.gen_dataset(test_names, by_video=True)
 
         return super()._train(epochs, train_dataset, test_dataset)

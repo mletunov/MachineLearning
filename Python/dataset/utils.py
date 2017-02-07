@@ -67,6 +67,11 @@ def read_avi(path, frame_func=None):
     cap.release()
     return np.array(result)
 
+def shuffle(array):
+    temp = np.array(array)
+    np.random.shuffle(temp)
+    return temp
+
 def split(array, frac):
     temp = np.array(array)
     indices = np.random.permutation(temp.shape[0])
