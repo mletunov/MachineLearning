@@ -4,7 +4,8 @@ import dataset.utils as utils
 from learning import baseNetwork
 
 class SimpleModel(baseNetwork.BaseModel):
-    def __init__(self, checkpoint_dir=None, seed=None):
+    def __init__(self, frame, checkpoint_dir=None, seed=None):
+        self.frame = frame
         self.seed = seed
         return super().__init__(checkpoint_dir)
 
@@ -13,14 +14,13 @@ class SimpleModel(baseNetwork.BaseModel):
         with self.graph.as_default():
             self.num_classes = 2
             self.num_steps=num_steps
-            frame_size = (288, 360, 3)
 
             if self.seed:
                 tf.set_random_seed(self.seed)
 
             with tf.name_scope("input"):
                 # batch x epoch x height x width x channels; epoch length = num_steps so we can use multiple epochs in one batch
-                x = tf.placeholder(tf.float32, (None, num_steps, *frame_size))
+                x = tf.placeholder(tf.float32, (None, num_steps, *self.frame))
                 flatten_x = tf.reshape(x, (-1, num_steps, np.prod(x.get_shape().as_list()[2:])))
 
             with tf.name_scope("rnn"):
@@ -31,7 +31,7 @@ class SimpleModel(baseNetwork.BaseModel):
                 output = tf.reshape(rnn_outputs, shape=(-1, rnn_state)) if avg_result else rnn_outputs[:,-1,:]
 
             with tf.name_scope("dense"):
-                dense_w = tf.Variable(tf.truncated_normal([rnn_state, self.num_classes]), tf.float32, name="w")
+                dense_w = tf.Variable(super().norm([rnn_state, self.num_classes]), tf.float32, name="w")
                 dense_b = tf.Variable(tf.zeros([self.num_classes]), tf.float32, name = "b")
                 dense = tf.add(tf.matmul(output, dense_w), dense_b, name="dense")
 

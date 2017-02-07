@@ -9,6 +9,13 @@ class BaseModel():
         utils.make_sure_path_exists(checkpoint_dir)
         return super().__init__(**kwargs)
 
+    @staticmethod
+    def norm(shape):
+        return tf.random_normal(shape=shape, mean=0.0, stddev=0.05, dtype=tf.float32)
+    @staticmethod
+    def norm2(shape):
+        return tf.truncated_normal(shape=shape, stddev=0.1)
+
     def save(self, sess, checkpoint_dir=None, global_step=None):
         if not checkpoint_dir:
             checkpoint_dir = self._checkpoint_dir

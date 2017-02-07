@@ -1,10 +1,12 @@
 import numpy as np
+from PIL import Image
 import dataset.utils as utils
 
 class HockeyDataset:
-    def __init__(self, source_url, source_dir, max_size=None):
+    def __init__(self, source_url, source_dir, frame, max_size=None):
         self.url = source_url
         self.dir = source_dir
+        self.frame = frame
         self.max_size = max_size
 
     def read_names(self, shuffle=False):
@@ -27,8 +29,10 @@ class HockeyDataset:
 
     def read_avi(self, name):
         def frame_func(frame):
-             assert(frame.shape == (288, 360, 3))
-             return frame #frame/255.
+            img = Image.fromarray(frame)
+            resized = img.resize((self.frame[1], self.frame[0]), Image.ANTIALIAS)
+            result = np.asarray(resized)
+            return result/255.
 
         return utils.read_avi(utils.path_join(self.dir, name), frame_func)
 
