@@ -50,7 +50,7 @@ class BaseModel():
             feed_dict={self.input: x if hasattr(x, '__len__') else [x]}
             if hasattr(self, "keep_prob"):
                 feed_dict[self.keep_prob] = 1.0
-            prediction = sess.run(self.prediction, feed_dict=feed_dict)
+            prediction = self.prediction.eval(feed_dict=feed_dict)
             return prediction
 
         return self.execute(predict_impl) if sess is None else predict_impl(sess)
