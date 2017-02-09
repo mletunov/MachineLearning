@@ -1,70 +1,90 @@
 import dataset as ds
 import learning
+import argparse
 
-ds.run_tests()
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", "--mode", help="Network functional mode", required=True, choices=["TRAIN", "PREDICT"])
+    parser.add_argument("-t", "--type", help="Network type", required=True,
+                        choices=["RNN_FULL", "RNN_SIMPLE", "RNN_CNN", "RNN_CNN_BATCH", "RNN_CNN_DROP", "RNN_CNN_BATCH_DROP"])
+    parser.add_argument("-r", "--rate", default=1e-4, type=float, help="Learning rate. 1e-4 by default")
+    parser.add_argument("-f", "--frame", type=int, nargs=2, default=[240, 320], help="Frame size -f Height Width. 240 x 320 by default")
+    parser.add_argument("-s", "--step", type=int, default=30, help="Number of sequential frames using by RNN. 30 by default")
+    parser.add_argument("-e", "--epoch", type=int, default=5, help="Number of epochs to train. 5 by default")
+    parser.add_argument("-b", "--batch", type=int, default=10, help="Batch size. 10 by default")
+    parser.add_argument("-d", "--dir", help="Checkpoint directory")
+    parser.add_argument("--max", type=int, help="Max count of video to use")
+    parser.add_argument("--rnn", default=50, type=int, help="Size of RNN state vector. 50 by default")
+
+    args = parser.parse_args()
+
+    source_url = 'https://datastora.blob.core.windows.net/datasets/HockeyFights.zip'
+    # source_url = 'http://visilab.etsii.uclm.es/personas/oscar/FightDetection/HockeyFights.zip'
+    source_dir = 'Data'
+
+    frame = (*args.frame, 3)
+    dataset = ds.HockeyDataset(source_url, source_dir, frame, max_size=args.max)
+    model = create_model(args.type, frame, args.rnn, args.step, dir=args.dir)
+
+    if args.mode == "TRAIN":
+        trainer = create_trainer(args.type, model, args.rate)
+        trainer.train(dataset, epochs=args.epoch, batch_size=args.batch)
+
+    elif args.mode == "PREDICT":
+        predictor = create_predictor(model)
+        result = predictor.predict(dataset, batch_size=args.batch)
+        print("Accuracy:", predictor.accuracy(result))
 
 
-source_url = 'https://datastora.blob.core.windows.net/datasets/HockeyFights.zip'
-#source_url = 'http://visilab.etsii.uclm.es/personas/oscar/FightDetection/HockeyFights.zip'
-#source_url = 'https://github.com/marmelroy/Zip/raw/master/ZipTests/bb8.zip'
-source_dir = 'Data'
-#frame = (480, 640, 3)
-frame = (240, 320, 3)
+def create_model(type, frame, state, steps, dir=None):
+    def full_model(path):
+        return lambda: learning.fullVideo.FullModel(
+            frame=frame, checkpoint_dir=path,
+            seed=100).build(rnn_state=state, avg_result=True)
 
-dataset = ds.HockeyDataset(source_url, source_dir, frame, max_size=1000)
+    def simple_model(path):
+        return lambda: learning.simpleVideo.SimpleModel(
+            frame=frame, checkpoint_dir=path,
+            seed=100).build(rnn_state=state, num_steps=steps, avg_result=True)
 
-class Mode:
-    TRAIN = 0,
-    PREDICT = 1
+    def cnn_model(path, batch_norm, dropout):
+        return lambda: learning.cnnVideo.CnnModel(
+            frame=frame, checkpoint_dir=path,
+            seed=100).build(rnn_state=state, num_steps=steps, avg_result=True, batch_norm=batch_norm, dropout=dropout)
 
-class Model:
-    RNN_FULL = 0,
-    RNN_SIMPLE = 1,
-    RNN_CNN_AVG = 2,
-    RNN_CNN_BATCH = 3,
-    RNN_CNN_DROP = 4,
-    RNN_CNN_BATCH_DROP = 5,
+    folder = "Model"
+    models = {
+        "RNN_FULL": full_model(ds.utils.path_join(folder, dir or "full")),
+        "RNN_SIMPLE": simple_model(ds.utils.path_join(folder, dir or "simple")),
+        "RNN_CNN": cnn_model(ds.utils.path_join(folder, dir or "cnn"), False, False),
+        "RNN_CNN_BATCH":  cnn_model(ds.utils.path_join(folder, dir or "batch_norm"), True, False),
+        "RNN_CNN_DROP": cnn_model(ds.utils.path_join(folder, dir or "drop"), False, True),
+        "RNN_CNN_BATCH_DROP": cnn_model(ds.utils.path_join(folder, dir or "batch_drop"), True, True),
+    }
 
-mode = Mode.TRAIN
-type = Model.RNN_CNN_AVG
+    return models[type]()
 
-if type == Model.RNN_FULL:
-    model = learning.fullVideo.FullModel(frame=frame, checkpoint_dir='Models/full', seed=100).build(rnn_state=50, avg_result=True)
-    if mode == Mode.TRAIN:
-        trainer = learning.fullVideo.FullTrainer(model).build(learning_rate=1e-4)
-        losses, accuracies = trainer.train(dataset, epochs=5)
 
-if type == Model.RNN_SIMPLE:
-    model = learning.simpleVideo.SimpleModel(frame=frame, checkpoint_dir='Models/simple', seed=100).build(rnn_state=50, num_steps=30, avg_result=True)
-    if mode == Mode.TRAIN:
-        trainer = learning.simpleVideo.SimpleTrainer(model).build(learning_rate=1e-4)
-        losses, accuracies = trainer.train(dataset, epochs=5, batch_size=20)
+def create_trainer(type, model, rate):
+    def cnn_trainer():
+        return lambda: learning.cnnVideo.CnnTrainer(model).build(learning_rate=rate)
 
-if type == Model.RNN_CNN_AVG:
-    model = learning.cnnVideo.CnnModel(frame=frame, checkpoint_dir='Models/cnn_50', seed=100).build(rnn_state=50, num_steps=30, avg_result=True)
-    if mode == Mode.TRAIN:
-        trainer = learning.cnnVideo.CnnTrainer(model).build(learning_rate=1e-4)
-        losses, accuracies = trainer.train(dataset, epochs=5, batch_size=20)
+    trainers = {
+        "RNN_FULL": lambda: learning.fullVideo.FullTrainer(model).build(learning_rate=rate),
+        "RNN_SIMPLE": lambda: learning.simpleVideo.SimpleTrainer(model).build(learning_rate=rate),
+        "RNN_CNN": cnn_trainer(),
+        "RNN_CNN_BATCH": cnn_trainer(),
+        "RNN_CNN_DROP": cnn_trainer(),
+        "RNN_CNN_BATCH_DROP": cnn_trainer(),
+    }
 
-if type == Model.RNN_CNN_BATCH:
-    model = learning.cnnVideo.CnnModel(frame=frame, checkpoint_dir='Models/batch_norm', seed=100).build(rnn_state=50, num_steps=30, avg_result=True, batch_norm=True)
-    if mode == Mode.TRAIN:
-        trainer = learning.cnnVideo.CnnTrainer(model).build(learning_rate=1e-4)
-        losses, accuracies = trainer.train(dataset, epochs=5, batch_size=20)
+    return trainers[type]()
 
-if type == Model.RNN_CNN_DROP:
-    model = learning.cnnVideo.CnnModel(frame=frame, checkpoint_dir='Models/drop', seed=100).build(rnn_state=50, num_steps=30, avg_result=True, dropout=True)
-    if mode == Mode.TRAIN:
-        trainer = learning.cnnVideo.CnnTrainer(model).build(learning_rate=1e-4)
-        losses, accuracies = trainer.train(dataset, epochs=5, batch_size=20)
 
-if type == Model.RNN_CNN_BATCH_DROP:
-    model = learning.cnnVideo.CnnModel(frame=frame, checkpoint_dir='Models/batch_drop', seed=100).build(rnn_state=50, num_steps=30, avg_result=True, batch_norm=True, dropout=True)
-    if mode == Mode.TRAIN:
-        trainer = learning.cnnVideo.CnnTrainer(model).build(learning_rate=1e-4)
-        losses, accuracies = trainer.train(dataset, epochs=5, batch_size=20)
+def create_predictor(type, model):
+    return learning.Predictor(model)
 
-if mode == Mode.PREDICT and model:
-    predictor = learning.Predictor(model)
-    result = predictor.predict(dataset, batch_size=20)
-    print("Accuracy:", predictor.accuracy(result))
+
+if __name__ == "__main__":
+    main()

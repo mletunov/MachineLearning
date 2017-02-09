@@ -74,7 +74,7 @@ class FullTrainer(baseNetwork.BaseTrainer):
             self.init = [var.initializer for var in tf.global_variables() if var.name.startswith('train')]
         return self
 
-    def train(self, dataset, epochs):
+    def train(self, dataset, epochs, batch_size=None):
         if self.model.seed:
             np.random.seed(self.model.seed)
 
