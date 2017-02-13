@@ -14,6 +14,7 @@ def main():
     parser.add_argument("-e", "--epoch", type=int, default=5, help="Number of epochs to train. 5 by default")
     parser.add_argument("-b", "--batch", type=int, default=10, help="Batch size. 10 by default")
     parser.add_argument("-d", "--dir", help="Checkpoint directory")
+    parser.add_argument("-n", "--norm", default="Normal_0.05", help="Initialization to use for learning from scratch")
     parser.add_argument("--max", type=int, help="Max count of video to use")
     parser.add_argument("--rnn", default=50, type=int, help="Size of RNN state vector. 50 by default")
 
@@ -25,7 +26,7 @@ def main():
 
     frame = (*args.frame, 3)
     dataset = ds.HockeyDataset(source_url, source_dir, frame, max_size=args.max)
-    model = create_model(args.type, frame, args.rnn, args.step, dir=args.dir)
+    model = create_model(args.type, frame, args.rnn, args.step, norm=args.norm, dir=args.dir)
 
     if args.mode == "TRAIN":
         trainer = create_trainer(args.type, model, args.rate)
@@ -37,20 +38,20 @@ def main():
         print("Accuracy:", predictor.accuracy(result))
 
 
-def create_model(type, frame, state, steps, dir=None):
+def create_model(type, frame, state, steps, norm, dir=None):
     def full_model(path):
         return lambda: learning.fullVideo.FullModel(
-            frame=frame, checkpoint_dir=path,
+            frame=frame, norm_type=norm, checkpoint_dir=path,
             seed=100).build(rnn_state=state, avg_result=True)
 
     def simple_model(path):
         return lambda: learning.simpleVideo.SimpleModel(
-            frame=frame, checkpoint_dir=path,
+            frame=frame, norm_type=norm, checkpoint_dir=path,
             seed=100).build(rnn_state=state, num_steps=steps, avg_result=True)
 
     def cnn_model(path, batch_norm, dropout):
         return lambda: learning.cnnVideo.CnnModel(
-            frame=frame, checkpoint_dir=path,
+            frame=frame, norm_type=norm, checkpoint_dir=path,
             seed=100).build(rnn_state=state, num_steps=steps, avg_result=True, batch_norm=batch_norm, dropout=dropout)
 
     folder = "Model"

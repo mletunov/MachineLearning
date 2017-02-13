@@ -4,10 +4,10 @@ import dataset.utils as utils
 from learning import baseNetwork
   
 class FullModel(baseNetwork.BaseModel):
-    def __init__(self, frame, checkpoint_dir=None, seed=None):
+    def __init__(self, frame, norm_type, checkpoint_dir=None, seed=None):
         self.frame = frame
         self.seed = seed
-        return super().__init__(checkpoint_dir)
+        return super().__init__(norm_type, checkpoint_dir)
 
     def build(self, rnn_state=100, avg_result=False):
         self.graph = tf.Graph()
@@ -32,7 +32,7 @@ class FullModel(baseNetwork.BaseModel):
                 output = tf.reshape(rnn_outputs, shape=(-1, rnn_state)) if avg_result else rnn_outputs[:,-1,:]
     
             with tf.name_scope("dense"):
-                dense_w = tf.Variable(super().norm([rnn_state, self.num_classes]), tf.float32, name="w")
+                dense_w = tf.Variable(self.initializer(shape=[rnn_state, self.num_classes]), tf.float32, name="w")
                 dense_b = tf.Variable(tf.zeros([self.num_classes]), tf.float32, name = "b")
                 dense = tf.add(tf.matmul(output, dense_w), dense_b, name="dense")
         

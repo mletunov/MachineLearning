@@ -4,17 +4,25 @@ import dataset.utils as utils
 
 class BaseModel():
     """ base model for Hockey dataset """
-    def __init__(self, checkpoint_dir=None, **kwargs):
+    def __init__(self, norm_type, checkpoint_dir=None, **kwargs):
         self._checkpoint_dir = checkpoint_dir
+        self.initializer = BaseModel.create_initializer(norm_type)
         utils.make_sure_path_exists(checkpoint_dir)
         return super().__init__(**kwargs)
 
     @staticmethod
-    def norm(shape):
-        return tf.random_normal(shape=shape, mean=0.0, stddev=0.05, dtype=tf.float32)
-    @staticmethod
-    def norm2(shape):
-        return tf.truncated_normal(shape=shape, stddev=0.1)
+    def create_initializer(norm_type): 
+        initializers = {
+            "Normal_0.05": lambda: tf.truncated_normal_initializer(mean=0.0, stddev=0.05, dtype=tf.float32),
+            "Normal_0.1": lambda: tf.truncated_normal_initializer(mean=0.0, stddev=0.1, dtype=tf.float32),
+            "Uniform_0.05": lambda: tf.random_uniform_initializer(minval=-0.05, maxval=0.05),
+            "Uniform_0.1": lambda: tf.random_uniform_initializer(minval=-0.1, maxval=0.1),
+            "Uniform_scale": lambda: tf.uniform_unit_scaling_initializer(factor=1.0),
+            "Xavier_uniform": lambda: tf.contrib.layers.variance_scaling_initializer(factor=1.0, mode='FAN_AVG', uniform=True),
+            "Xavier_normal": lambda: tf.contrib.layers.variance_scaling_initializer(factor=1.0, mode='FAN_AVG', uniform=False),
+            "He_init": lambda: tf.contrib.layers.initializers.variance_scaling_initializer(factor=2.0, mode='FAN_IN', uniform=False)
+        }
+        return initializers[norm_type]()
 
     def save(self, sess, checkpoint_dir=None, global_step=None):
         if not checkpoint_dir:

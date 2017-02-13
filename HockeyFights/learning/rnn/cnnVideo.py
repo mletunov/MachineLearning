@@ -4,10 +4,10 @@ import dataset.utils as utils
 from learning import baseNetwork
 
 class CnnModel(baseNetwork.BaseModel):
-    def __init__(self, frame, checkpoint_dir=None, seed=None):
+    def __init__(self, frame, norm_type, checkpoint_dir=None, seed=None):
         self.frame = frame
         self.seed = seed
-        return super().__init__(checkpoint_dir)
+        return super().__init__(norm_type, checkpoint_dir)
 
     def build(self, rnn_state=20, num_steps=30, avg_result=False, batch_norm=False, dropout=False):
         self.graph = tf.Graph()
@@ -28,7 +28,7 @@ class CnnModel(baseNetwork.BaseModel):
 
             with tf.name_scope("cnn"):
                 with tf.name_scope("conv1"):
-                    conv1_w = tf.Variable(super().norm(shape=(5, 5, 3, 16)), tf.float32, name="w")
+                    conv1_w = tf.Variable(self.initializer(shape=(5, 5, 3, 16)), tf.float32, name="w") 
                     conv1_b = tf.Variable(tf.zeros(shape=(16)), name="b")
                     conv1 = tf.nn.relu(tf.nn.conv2d(flatten_x, conv1_w, strides=[1, 2, 2, 1], padding="VALID") + conv1_b, name="conv")
                 
@@ -42,12 +42,12 @@ class CnnModel(baseNetwork.BaseModel):
                         conv1 = tf.nn.batch_normalization(conv1, batch_mean, batch_var, beta, scale, epsilon)
 
                 with tf.name_scope("conv2"):
-                    conv2_w = tf.Variable(super().norm(shape=(7, 7, 16, 16)), tf.float32, name="w")
+                    conv2_w = tf.Variable(self.initializer(shape=(7, 7, 16, 16)), tf.float32, name="w")
                     conv2_b = tf.Variable(tf.zeros(shape=(16)), name="b")
                     conv2 = tf.nn.relu(tf.nn.conv2d(conv1, conv2_w, strides=[1, 2, 2, 1], padding="VALID") + conv2_b, name="conv")
 
                 with tf.name_scope("conv3"):
-                    conv3_w = tf.Variable(super().norm(shape=(9, 9, 16, 16)), tf.float32, name="w")
+                    conv3_w = tf.Variable(self.initializer(shape=(9, 9, 16, 16)), tf.float32, name="w")
                     conv3_b = tf.Variable(tf.zeros(shape=(16)), name="b")
                     conv3 = tf.nn.relu(tf.nn.conv2d(conv2, conv3_w, strides=[1, 2, 2, 1], padding="VALID") + conv3_b, name="conv")
                     pool3 = tf.nn.max_pool(conv3, ksize=[1, 3, 3, 1], strides=[1, 3, 3, 1], padding="VALID", name="pool")
@@ -65,9 +65,9 @@ class CnnModel(baseNetwork.BaseModel):
                 init_state = cell.zero_state(tf.shape(x)[0], dtype=tf.float32)
                 rnn_outputs, final_state = tf.nn.dynamic_rnn(cell, rnn_inputs, initial_state=init_state)
                 output = tf.reshape(rnn_outputs, shape=(-1, rnn_state)) if avg_result else rnn_outputs[:,-1,:]
-
+                
                 with tf.name_scope("dense"):
-                    dense_w = tf.Variable(super().norm(shape=(rnn_state, self.num_classes)), tf.float32, name="w")
+                    dense_w = tf.Variable(self.initializer(shape=(rnn_state, self.num_classes)), tf.float32, name="w")
                     dense_b = tf.Variable(tf.zeros([self.num_classes]), tf.float32, name = "b")
                     dense = tf.add(tf.matmul(output, dense_w), dense_b, name="out")
 
