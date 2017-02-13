@@ -33,7 +33,7 @@ def main():
         trainer.train(dataset, epochs=args.epoch, batch_size=args.batch)
 
     elif args.mode == "PREDICT":
-        predictor = create_predictor(model)
+        predictor = create_predictor(args.type, model)
         result = predictor.predict(dataset, batch_size=args.batch)
         print("Accuracy:", predictor.accuracy(result))
 
