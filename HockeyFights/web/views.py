@@ -5,9 +5,13 @@ Routes and views for the flask application.
 from datetime import datetime
 from web import app
 
-import tempfile
 import flask
 import os
+
+import random
+import string
+
+char_set = string.ascii_lowercase + string.digits
 
 @app.route('/')
 @app.route('/home')
@@ -22,9 +26,11 @@ def home():
 @app.route('/upload', methods=["POST"])
 def upload():
     try:
-        fileName = tempfile.mkstemp('.avi', 'zz', app.config['UPLOAD_FOLDER'])[1]
-        url = app.config['UPLOAD_FOLDER'] + '/' + os.path.basename(fileName)
-        with open(fileName, 'wb') as file:
+        fileName = '{0}{1}{2}'.format('zz', ''.join(random.sample(char_set, 8)), '.avi')
+        path = os.path.join('web', app.config['UPLOAD_FOLDER'], fileName)
+        url = '/video/{0}'.format(fileName)
+        
+        with open(path, 'wb') as file:
             chunk_size = 4096
             while True:
                 chunk = flask.request.stream.read(chunk_size)
@@ -32,6 +38,12 @@ def upload():
                     break
 
                 file.write(chunk)
+            file.close()
         return flask.jsonify({'success': True , 'fileName': url})
     except Exception as ex:
         return flask.jsonify({'success': False, 'message': ex})
+
+@app.route('/video/<path:filename>')
+def download_file(filename):
+    return flask.send_from_directory(app.config['UPLOAD_FOLDER'],
+                               filename, as_attachment=True)
