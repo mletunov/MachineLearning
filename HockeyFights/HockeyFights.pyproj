@@ -15,7 +15,8 @@
     <InterpreterId>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</InterpreterId>
     <InterpreterVersion>3.5</InterpreterVersion>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>-m TRAIN -t RNN_CNN</CommandLineArguments>
+    <CommandLineArguments>
+    </CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -60,6 +61,15 @@
     <Folder Include="dataset\" />
     <Folder Include="learning\" />
     <Folder Include="learning\rnn\" />
+    <Folder Include="web\" />
+    <Folder Include="web\static\" />
+    <Folder Include="web\static\content\" />
+    <Folder Include="web\static\fonts\" />
+    <Folder Include="web\static\scripts\" />
+    <Folder Include="web\templates\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="requirements.txt" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

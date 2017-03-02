@@ -5,8 +5,9 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-m", "--mode", help="Network functional mode", required=True, choices=["TRAIN", "PREDICT"])
-    parser.add_argument("-t", "--type", help="Network type", required=True,
+    parser.add_argument("-w", "--web", help="Web mode", default=False, required=False, action='store_true')
+    parser.add_argument("-m", "--mode", help="Network functional mode", required=False, choices=["TRAIN", "PREDICT"])
+    parser.add_argument("-t", "--type", help="Network type", required=False,
                         choices=["RNN_FULL", "RNN_SIMPLE", "RNN_CNN", "RNN_CNN_BATCH", "RNN_CNN_DROP", "RNN_CNN_BATCH_DROP"])
     parser.add_argument("-r", "--rate", default=1e-4, type=float, help="Learning rate. 1e-4 by default")
     parser.add_argument("-f", "--frame", type=int, nargs=2, default=[240, 320], help="Frame size -f Height Width. 240 x 320 by default")
@@ -19,6 +20,22 @@ def main():
     parser.add_argument("--rnn", default=50, type=int, help="Size of RNN state vector. 50 by default")
 
     args = parser.parse_args()
+    
+    if args.web:
+        from os import environ
+        from web import app
+
+        HOST = environ.get('SERVER_HOST', 'localhost')
+        try:
+            PORT = int(environ.get('SERVER_PORT', '5555'))
+        except ValueError:
+            PORT = 5555
+        app.run(HOST, PORT)
+        return
+    
+    if args.mode is None or args.type is None:
+        parser.error('mode and type args are required')
+        return
 
     source_url = 'https://datastora.blob.core.windows.net/datasets/HockeyFights.zip'
     # source_url = 'http://visilab.etsii.uclm.es/personas/oscar/FightDetection/HockeyFights.zip'
