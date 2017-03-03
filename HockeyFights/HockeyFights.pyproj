@@ -15,7 +15,7 @@
     <InterpreterId>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</InterpreterId>
     <InterpreterVersion>3.5</InterpreterVersion>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>-w</CommandLineArguments>
+    <CommandLineArguments>-m WEB -t RNN_CNN</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -43,6 +43,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="learning\baseNetwork.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="learning\factory.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="learning\rnn\simpleVideo.py" />
