@@ -25,7 +25,7 @@ class SimpleModel(baseNetwork.BaseModel):
 
             with tf.name_scope("rnn"):
                 rnn_inputs = flatten_x
-                cell = tf.nn.rnn_cell.GRUCell(rnn_state)
+                cell = tf.contrib.rnn.GRUCell(rnn_state)
                 init_state = cell.zero_state(tf.shape(flatten_x)[0], dtype=tf.float32)
                 rnn_outputs, final_state = tf.nn.dynamic_rnn(cell, rnn_inputs, initial_state=init_state)
                 output = tf.reshape(rnn_outputs, shape=(-1, rnn_state)) if avg_result else rnn_outputs[:,-1,:]
