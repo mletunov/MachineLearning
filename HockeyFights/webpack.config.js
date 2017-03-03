@@ -6,6 +6,7 @@ module.exports = {
     ],
     output: {
         path: __dirname + '/web/static',
+        publicPath: '/web/static',
         filename: "bundle.js"
     },
     resolve: {

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "dev": "webpack-dev-server  --inline --hot --port 80"
   },
   "author": "",
   "license": "MIT",
@@ -22,5 +23,8 @@
     "superagent": "^3.5.0",
     "video-react": "^0.7.1",
     "webpack": "^2.2.1"
+  },
+  "devDependencies": {
+    "webpack-dev-server": "^2.4.1"
   }
 }
