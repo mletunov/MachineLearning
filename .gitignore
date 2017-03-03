@@ -247,3 +247,5 @@ ModelManifest.xml
 
 # Python
 __pycache__
+
+HockeyFights/node_modules

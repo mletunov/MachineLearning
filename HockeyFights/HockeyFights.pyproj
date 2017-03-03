@@ -65,10 +65,14 @@
     <Folder Include="web\static\content\" />
     <Folder Include="web\static\fonts\" />
     <Folder Include="web\static\scripts\" />
+    <Folder Include="web\static\scripts\app\" />
+    <Folder Include="web\static\scripts\app\components\" />
     <Folder Include="web\templates\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="package.json" />
     <Content Include="requirements.txt" />
+    <Content Include="webpack.config.js" />
     <Content Include="web\static\content\bootstrap.css" />
     <Content Include="web\static\content\bootstrap.min.css" />
     <Content Include="web\static\content\site.css" />
@@ -76,6 +80,8 @@
     <Content Include="web\static\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="web\static\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="web\static\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="web\static\scripts\app\app.js" />
+    <Content Include="web\static\scripts\app\components\Index.js" />
     <Content Include="web\static\scripts\bootstrap.js" />
     <Content Include="web\static\scripts\bootstrap.min.js" />
     <Content Include="web\static\scripts\jquery-1.10.2.intellisense.js" />
