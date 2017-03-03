@@ -1,7 +1,3 @@
-"""
-Routes and views for the flask application.
-"""
-
 from datetime import datetime
 from web import app
 
@@ -10,6 +6,7 @@ import os
 
 import random
 import string
+import learning
 
 char_set = string.ascii_lowercase + string.digits
 
@@ -26,7 +23,7 @@ def home():
 @app.route('/upload', methods=["POST"])
 def upload():
     try:
-        fileName = '{0}{1}{2}'.format('zz', ''.join(random.sample(char_set, 8)), '.avi')
+        fileName = '{0}{1}{2}'.format('zz', ''.join(random.sample(char_set, 8)), '.mp4')
         path = os.path.join('web', app.config['UPLOAD_FOLDER'], fileName)
         url = '/video/{0}'.format(fileName)
         
@@ -47,3 +44,18 @@ def upload():
 def download_file(filename):
     return flask.send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename, as_attachment=True)
+
+@app.route('/test')
+def test():
+    path = os.path.join('web', app.config['UPLOAD_FOLDER'], flask.request.args.get('fileName'))
+    import cv2
+    
+    predictor = app.config['predictor']
+    
+    #learning.factory.video_dataset(path)
+    try:
+        cap = cv2.VideoCapture(path)
+        ret = cap.isOpened();
+        return flask.jsonify({'success': True})
+    except Exception as ex:
+        return flask.jsonify({'success': False, 'message': ex})
