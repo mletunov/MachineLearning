@@ -45,3 +45,7 @@
 .text-muted {
     color: #777;
 }
+
+.btn-end {
+    margin-right:20px;
+}

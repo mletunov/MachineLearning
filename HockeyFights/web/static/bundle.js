@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
+/******/ 	__webpack_require__.p = "/web/static";
 
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(__webpack_require__.s = 255);
@@ -14179,7 +14179,7 @@ var IndexComponent = function (_Component) {
 
     var _this = _possibleConstructorReturn(this, (IndexComponent.__proto__ || Object.getPrototypeOf(IndexComponent)).call(this, props));
 
-    _this.state = { timeStamps: [], videoLength: 0, videoSource: "" };
+    _this.state = { timeStamps: [], videoSource: "" };
     return _this;
   }
 
@@ -14191,49 +14191,43 @@ var IndexComponent = function (_Component) {
   }, {
     key: 'onDrop',
     value: function onDrop(files) {
-      var _this2 = this;
-
       var req = _superagent2.default.post('/upload');
       files.forEach(function (file) {
         req.attach('videoFile', file);
       });
-      req.end(function () {
-        return _this2.fileUploaded(files[0].name);
-      });
+      req.end(this.fileUploaded.bind(this));
     }
   }, {
     key: 'fileUploaded',
-    value: function fileUploaded(fileName) {
-      this.setState({ videoSource: '/videos/' + fileName });
+    value: function fileUploaded(err, result) {
 
+      this.setState({ videoSource: result.body.filePath });
+      this.getTimeStamps(result.body.fileName);
       this.refs.player.load();
     }
   }, {
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
+    key: 'getTimeStamps',
+    value: function getTimeStamps(fileName) {
+      var _this2 = this;
 
-      var newTimeStamps = [];
-      for (var i = 10; i <= 300; i = i + 10) {
-        newTimeStamps.push(i);
-      }
+      fetch('/time/' + fileName).then(function (response) {
+        if (response.status !== 200) {
+          console.log('Looks like there was a problem. Status Code: ' + response.status);
+          return;
+        }
 
-      this.setState({ timeStamps: newTimeStamps });
+        response.json().then(function (stamps) {
+          _this2.setState({ timeStamps: stamps });
+        });
+      }).catch(function (err) {
+        console.log('Fetch Error :-S', err);
+      });
     }
   }, {
-    key: 'handleStateChange',
-    value: function handleStateChange(state, prevState) {
+    key: 'processNewTimeStamps',
+    value: function processNewTimeStamps(stamps) {
 
-      if (state.duration != prevState.duration) {
-        var newTimeStamps = [];
-        for (var i = 10; i <= state.duration; i = i + 10) {
-          newTimeStamps.push(i);
-        }
-        this.setState({
-          videoLength: state.duration,
-          timeStamps: newTimeStamps
-        });
-      }
+      this.setState({ timeStamps: stamps });
     }
   }, {
     key: 'goToStemp',
@@ -14245,13 +14239,13 @@ var IndexComponent = function (_Component) {
     value: function render() {
       var _this3 = this;
 
-      var timeButtons = this.state && this.state.timeStamps ? this.state.timeStamps.map(function (number, index) {
+      var timeButtons = this.state && this.state.timeStamps ? this.state.timeStamps.map(function (stamp, index) {
         return _react2.default.createElement(
           'button',
-          { key: index, type: 'button', className: 'btn btn-default time-stamp-button', onClick: function onClick() {
-              return _this3.goToStemp(number);
+          { key: index, type: 'button', className: 'btn time-stamp-button ' + (stamp.fightStart == true ? 'btn-danger' : 'btn-default btn-end'), onClick: function onClick() {
+              return _this3.goToStemp(stamp.timeStamp);
             } },
-          number
+          stamp.fightStart == true ? 'Fight' : 'Fight end'
         );
       }) : null;
 

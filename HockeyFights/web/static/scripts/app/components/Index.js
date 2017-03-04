@@ -7,7 +7,7 @@ class IndexComponent extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {timeStamps:[], videoLength: 0, videoSource:""};
+    this.state = {timeStamps:[], videoSource:""};
   }
 
   openUploadClick(){
@@ -19,39 +19,40 @@ class IndexComponent extends Component {
         files.forEach((file)=> {
             req.attach('videoFile', file);
         });
-        req.end(() => this.fileUploaded(files[0].name));
+        req.end(this.fileUploaded.bind(this));
     }
 
-  fileUploaded(fileName){
-    this.setState({videoSource: `/videos/${fileName}`})
+  fileUploaded(err, result){
 
+    this.setState({videoSource: result.body.filePath})
+    this.getTimeStamps(result.body.fileName)
     this.refs.player.load();
   }
 
-  componentDidMount(){
-      this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
 
-      let newTimeStamps = [];
-      for(let i = 10; i <= 300; i = i + 10){
-          newTimeStamps.push(i);
-      }
+  getTimeStamps(fileName){
+    fetch(`/time/${fileName}`)
+      .then((response) =>{
+          if (response.status !== 200) {
+            console.log('Looks like there was a problem. Status Code: ' +  response.status);
+            return;
+          }
 
-      this.setState({timeStamps: newTimeStamps} )
+          response.json().then((stamps) =>
+            {
+              this.setState({timeStamps: stamps});
+            }
+          );
+        }
+      )
+      .catch(function(err) {
+        console.log('Fetch Error :-S', err);
+      });
   }
 
-  handleStateChange(state, prevState) {
+  processNewTimeStamps(stamps){
 
-    if(state.duration != prevState.duration)
-    {
-      let newTimeStamps = [];
-      for(let i = 10; i <= state.duration; i = i + 10){
-          newTimeStamps.push(i);
-      }
-      this.setState({
-        videoLength: state.duration,
-        timeStamps: newTimeStamps
-      });
-    }
+    this.setState({timeStamps: stamps});
   }
 
   goToStemp(seconds) {
@@ -62,8 +63,8 @@ class IndexComponent extends Component {
 
 
     let timeButtons = (this.state && this.state.timeStamps) ?
-                          this.state.timeStamps.map((number, index) =>
-                            <button key={index} type="button"   className="btn btn-default time-stamp-button" onClick={() => this.goToStemp(number)}>{number}</button>
+                          this.state.timeStamps.map((stamp, index) =>
+                            <button key={index} type="button" className={'btn time-stamp-button ' + (stamp.fightStart == true ? 'btn-danger' : 'btn-default btn-end')} onClick={() => this.goToStemp(stamp.timeStamp)}>{stamp.fightStart == true ? 'Fight': 'Fight end'}</button>
                           ) : null
 
     return (
