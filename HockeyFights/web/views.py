@@ -2,6 +2,7 @@ from datetime import datetime
 from web import app
 
 import flask
+from flask import request
 import os
 
 import random
@@ -25,17 +26,23 @@ def upload():
     try:
         fileName = '{0}{1}{2}'.format('zz', ''.join(random.sample(char_set, 8)), '.mp4')
         path = os.path.join('web', app.config['UPLOAD_FOLDER'], fileName)
+        pathToSave = os.path.join(os.getcwd(), 'web', app.config['UPLOAD_FOLDER'])
         url = '/video/{0}'.format(fileName)
+        
+        video = request.files['videoFile']
+
+
         
         with open(path, 'wb') as file:
             chunk_size = 4096
             while True:
-                chunk = flask.request.stream.read(chunk_size)
+                chunk = video.stream.read(chunk_size)
                 if len(chunk) == 0:
                     break
 
                 file.write(chunk)
             file.close()
+           
         return flask.jsonify({'success': True , 'fileName': url})
     except Exception as ex:
         return flask.jsonify({'success': False, 'message': ex})

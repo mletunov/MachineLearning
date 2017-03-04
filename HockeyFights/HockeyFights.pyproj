@@ -55,6 +55,8 @@
     <Compile Include="learning\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="web\views.py" />
+    <Compile Include="web\__init__.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\3.5" />
