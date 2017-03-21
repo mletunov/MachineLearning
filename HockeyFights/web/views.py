@@ -4,10 +4,14 @@ from web import app
 import flask
 from flask import request
 import os
+from flask.ext.cors import CORS, cross_origin
 
 import random
 import string
 import learning
+
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 char_set = string.ascii_lowercase + string.digits
 

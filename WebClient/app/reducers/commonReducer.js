@@ -9,11 +9,11 @@ let initialState = {
 const initialAction = { type: 'initial state'}
 
 const common = (state = initialState, action = initialAction) => {
-  
+
     switch (action.type) {
         case constants.VIDEO_UPLOADED:
             return update(state, {
-                filePath: { $set: action.filePath },
+                filePath: { $set: `${constants.API}${action.filePath}` },
                 isLoading: {$set: false}
             });
         case constants.TIME_STAMPS_RESEVED:

@@ -11,12 +11,11 @@ let commonAPI = {
       });
       return req.end();
   },
-  
+
   getTimeStamps(fileName){
-      return fetch(`${constants.API}/getTimeStamps`, {
-      method: 'post',
-      headers: {'Content-Type': 'application/json',},
-      body: JSON.stringify({fileName})
+      return fetch(`${constants.API}/time/${fileName}`, {
+      method: 'get',
+      headers: {'Content-Type': 'application/json',}
     })
     .then((response) => response.json())
   }

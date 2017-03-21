@@ -29,7 +29,7 @@ class Main extends Component {
             <div>
                 <Header/>
                 <div className="container content-block">
-                    
+
                         <div className="col-md-3">
                             <Uploader onFileSelected={this.onFileSelected.bind(this)} />
                         </div>
@@ -50,7 +50,6 @@ class Main extends Component {
 
 
 function mapStoreToProps(storeState) {
-    debugger;
   return {
     timeStamps: storeState.commonReducer.timeStamps,
     filePath: storeState.commonReducer.filePath,
