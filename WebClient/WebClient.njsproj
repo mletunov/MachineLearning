@@ -21,6 +21,7 @@
     <ScriptArguments>run prod</ScriptArguments>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".babelrc" />
     <Content Include="index.html" />
     <Content Include="package.json" />
     <Compile Include="webpack.config.js" />

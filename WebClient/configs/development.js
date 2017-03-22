@@ -4,11 +4,12 @@ module.exports = function (_path) {
         devtool: 'source-map',
         devServer: {
             historyApiFallback: true,
-            proxy: [{
-                path: "/api",
-                target: "http://localhost:5555",
-                ignorePath: true
-            }]
+            proxy: {
+                "/api": {
+                    target: "http://localhost:5555",
+                    pathRewrite: { "^/api": "" }
+                }
+            }
         },
     }
 };
