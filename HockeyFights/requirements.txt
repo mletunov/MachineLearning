@@ -1,3 +1,4 @@
 Flask==0.12
 flask-cors==3.0.2
+pillow==4.0.0
 TensorFlow==1.0.0

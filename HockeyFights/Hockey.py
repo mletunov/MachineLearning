@@ -35,7 +35,7 @@ def main():
     
     elif args.mode == "WEB":
         from os import environ
-        from web import app
+        from api import app
 
         HOST = environ.get('SERVER_HOST', 'localhost')
         app.config['predictor'] = learning.factory.create_predictor(args.type, model)

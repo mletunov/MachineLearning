@@ -27,6 +27,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="api\routes.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="dataset\HockeyDataset.py">
       <SubType>Code</SubType>
     </Compile>
@@ -55,8 +58,6 @@
     <Compile Include="learning\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="web\views.py" />
-    <Compile Include="web\__init__.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\3.5" />
@@ -65,45 +66,13 @@
     <Folder Include="dataset\" />
     <Folder Include="learning\" />
     <Folder Include="learning\rnn\" />
-    <Folder Include="web\" />
-    <Folder Include="web\static\" />
-    <Folder Include="web\static\content\" />
-    <Folder Include="web\static\fonts\" />
-    <Folder Include="web\static\scripts\" />
-    <Folder Include="web\static\scripts\app\" />
-    <Folder Include="web\static\scripts\app\components\" />
-    <Folder Include="web\templates\" />
+    <Folder Include="api\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="package.json" />
+    <Content Include="api\__init__.py">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="requirements.txt" />
-    <Content Include="webpack.config.js" />
-    <Content Include="web\static\content\bootstrap.css" />
-    <Content Include="web\static\content\bootstrap.min.css" />
-    <Content Include="web\static\content\site.css" />
-    <Content Include="web\static\fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="web\static\fonts\glyphicons-halflings-regular.svg" />
-    <Content Include="web\static\fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="web\static\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="web\static\scripts\app\app.js" />
-    <Content Include="web\static\scripts\app\components\Index.js" />
-    <Content Include="web\static\scripts\bootstrap.js" />
-    <Content Include="web\static\scripts\bootstrap.min.js" />
-    <Content Include="web\static\scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="web\static\scripts\jquery-1.10.2.js" />
-    <Content Include="web\static\scripts\jquery-1.10.2.min.js" />
-    <Content Include="web\static\scripts\jquery-1.10.2.min.map" />
-    <Content Include="web\static\scripts\jquery.validate-vsdoc.js" />
-    <Content Include="web\static\scripts\jquery.validate.js" />
-    <Content Include="web\static\scripts\jquery.validate.min.js" />
-    <Content Include="web\static\scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="web\static\scripts\jquery.validate.unobtrusive.min.js" />
-    <Content Include="web\static\scripts\modernizr-2.6.2.js" />
-    <Content Include="web\static\scripts\respond.js" />
-    <Content Include="web\static\scripts\respond.min.js" />
-    <Content Include="web\static\scripts\_references.js" />
-    <Content Include="web\templates\index.html" />
-    <Content Include="web\templates\layout.html" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
