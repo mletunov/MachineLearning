@@ -7,6 +7,8 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "HockeyFights", "HockeyFight
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "ImageNet", "ImageNet\ImageNet.pyproj", "{B9CAD0F4-C737-4E65-8820-28B8C89D07C2}"
 EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "WebClient", "WebClient\WebClient.njsproj", "{2FB15CC4-57AD-437B-AB95-9B1C2F6BC7A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,6 +19,10 @@ Global
 		{23226DB5-39D0-40BC-9A9B-96E06C24E9C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9CAD0F4-C737-4E65-8820-28B8C89D07C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B9CAD0F4-C737-4E65-8820-28B8C89D07C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FB15CC4-57AD-437B-AB95-9B1C2F6BC7A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FB15CC4-57AD-437B-AB95-9B1C2F6BC7A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FB15CC4-57AD-437B-AB95-9B1C2F6BC7A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FB15CC4-57AD-437B-AB95-9B1C2F6BC7A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
