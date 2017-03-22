@@ -1,5 +1,5 @@
 export default {
-    API: 'http://localhost:5555',
+    API: '/api',
 
     VIDEO_UPLOADED: 'VIDEO_UPLOADED',
     TIME_STAMPS_RESEVED: 'TIME_STAMPS_RESEVED',
