@@ -1,4 +1,5 @@
 from api import app
+from datetime import datetime
 
 import flask, os
 import random
@@ -18,25 +19,33 @@ def ajax(func):
     return wrapper
 
 char_set = string.ascii_lowercase + string.digits
+session = {}
 
-@app.route('/upload', methods=["POST"])
+@app.route('/api/upload', methods=["POST"])
 @ajax
-def upload():
+def api_upload():
     fileName = '{0}{1}{2}'.format('zz', ''.join(random.sample(char_set, 8)), '.mp4')
     path = os.path.join('api', app.config['UPLOAD_FOLDER'], fileName)
-    url = '/video/{0}'.format(fileName)
-
+    
     file = flask.request.files['videoFile']
     file.save(path)
-    return {'filePath': url, 'fileName': fileName}
 
-@app.route('/video/<fileName>')
-def download_file(fileName):
-    return flask.send_from_directory(app.config['UPLOAD_FOLDER'], fileName, as_attachment=True)
+    session_id = ''.join(random.sample(char_set, 10))
+    now = datetime.now()
+    session[session_id] = {'start': now, 'path': path}
+    return {'session': session_id}
 
-@app.route('/time/<path:fileName>')
+@app.route('/api/session/<id>')
 @ajax
-def get_time_stamps(fileName):
+def api_session(id):
+    session_info = session[id]
+    elapsed = (datetime.now() - session_info['start']).total_seconds()
+    if elapsed < 10:
+        return {'video': None, 'time': None}
+    
+    elif elapsed < 30:
+        return {'video': session_info['path'], 'time': None}
+
     stamps = [];
     for count in range(40):
         stamps.append({
@@ -44,16 +53,4 @@ def get_time_stamps(fileName):
                 'timeStamp': count * 10 
             })
 
-    return stamps
-
-@app.route('/test')
-@ajax
-def test():
-    path = os.path.join('web', app.config['UPLOAD_FOLDER'], flask.request.args.get('fileName'))
-    import cv2
-    
-    predictor = app.config['predictor']
-    
-    learning.factory.video_dataset(path)
-    cap = cv2.VideoCapture(path)
-    ret = cap.isOpened();
+    return {'video': session_info['path'], 'time': stamps}
