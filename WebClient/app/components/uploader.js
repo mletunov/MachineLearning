@@ -17,8 +17,8 @@ class Uploader extends Component {
 
     render() {
         return (
-            <div>
-                <Dropzone ref="dropUploader" onDrop={this.onDrop.bind(this)}>
+            <div className="uploader-blk">
+                <Dropzone className="drop-box-stl" ref="dropUploader" onDrop={this.onDrop.bind(this)}>
                     <div className="drop-text-block">
                         <div className="drop-text">Drop videos here</div>
                     </div>

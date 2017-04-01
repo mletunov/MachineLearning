@@ -13,10 +13,9 @@ class Video extends Component {
         {
             this.player.seek(nextProps.timeSeek);
         }
-    } 
+    }
 
     render() {
-        
         return (
             <div>
                 <Player

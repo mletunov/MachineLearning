@@ -1,8 +1,14 @@
 import constants from '../constants';
 import commonApi from '../api/common';
+import { browserHistory } from 'react-router';
 
 let actionsCreator = {
 
+  videoPageOpened(){
+    return {
+      type: constants.UPLOAD_PAGE_OPENED
+    }
+  },
   uploadFiles(files) {
     return (dispatch) => {
         dispatch({
@@ -10,26 +16,48 @@ let actionsCreator = {
         });
         commonApi.uploadFiles(files)
             .then((result) => {
-                dispatch({
-                type: constants.VIDEO_UPLOADED,
-                filePath: result.body.filePath
-              });
-              dispatch(actionsCreator.getTimeStamps(result.body.fileName));
+                browserHistory.push(`/deeplink/${result.body.session}`)
             })
     }
   },
 
-  getTimeStamps(fileName){
+  getSessionData(sessionId){
       return (dispatch) => {
-          commonApi.getTimeStamps(fileName)
-              .then((timeStamps) => {
-                  dispatch({
-                      type: constants.TIME_STAMPS_RESEVED,
-                      timeStamps: timeStamps
-                  });
-              })
+
+
+          var callBack = function(dispatch){
+            commonApi.getSessionData(sessionId)
+                .then((result) => {
+                    if(result.video && result.time){
+                      dispatch({
+                          type: constants.ALL_PROCESSED,
+                          timeStamps: result.time,
+                          filePath: result.video
+                      });
+
+                    } else if (result.video){
+                      dispatch({
+                          type: constants.VIDEO_PROCESSED,
+                          filePath: result.video
+                      });
+                      setTimeout(function(){ callBack(dispatch);}, 2000);
+                    } else if (result.time){
+                      dispatch({
+                          type: constants.STAMPS_PROCESSED,
+                          timeStamps: result.time
+                      })
+                      setTimeout(function(){ callBack(dispatch);}, 2000);
+                    } else {
+                      setTimeout(function(){ callBack(dispatch);}, 2000);
+                    }
+                  })
+          };
+
+          callBack(dispatch);
       }
+
   },
+
   seekVideo(time) {
       return {
           type: constants.SEEK_VIDEO,

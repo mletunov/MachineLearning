@@ -1,10 +1,14 @@
 from api import app
 from datetime import datetime
+from flask.ext.cors import cross_origin
+
+
 
 import flask, os
 import random
 import string
 import learning
+import jsonify
 
 def ajax(func):
     def wrapper(*args, **kwargs):
@@ -22,6 +26,7 @@ char_set = string.ascii_lowercase + string.digits
 session = {}
 
 @app.route('/api/upload', methods=["POST"])
+@cross_origin()
 @ajax
 def api_upload():
     fileName = '{0}{1}{2}'.format('zz', ''.join(random.sample(char_set, 8)), '.mp4')
@@ -36,6 +41,7 @@ def api_upload():
     return {'session': session_id}
 
 @app.route('/api/session/<id>')
+@cross_origin()
 @ajax
 def api_session(id):
     session_info = session[id]

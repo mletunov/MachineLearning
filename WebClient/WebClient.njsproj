@@ -53,6 +53,31 @@
     <Folder Include="app\reducers" />
     <Folder Include="app\store" />
     <Folder Include="configs" />
+    <Folder Include="typings\" />
+    <Folder Include="typings\globals\" />
+    <Folder Include="typings\globals\bootstrap\" />
+    <Folder Include="typings\globals\marked\" />
+    <Folder Include="typings\globals\node\" />
+    <Folder Include="typings\globals\react-dropzone\" />
+    <Folder Include="typings\globals\react-router\" />
+    <Folder Include="typings\globals\redux-thunk\" />
+    <Folder Include="typings\globals\redux\" />
+    <Folder Include="typings\globals\webpack-dev-server\" />
+    <Folder Include="typings\globals\webpack-merge\" />
+    <Folder Include="typings\globals\whatwg-fetch\" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="typings\globals\bootstrap\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\marked\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\node\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\react-dropzone\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\react-router\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\redux-thunk\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\redux\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\webpack-dev-server\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\webpack-merge\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\whatwg-fetch\index.d.ts" />
+    <TypeScriptCompile Include="typings\index.d.ts" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->

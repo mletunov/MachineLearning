@@ -1,9 +1,11 @@
-﻿import { combineReducers } from 'redux'
-import commonReducer from './commonReducer'
+﻿import { combineReducers } from 'redux';
+import commonReducer from './commonReducer';
+import loadingReducer from './loadingReducer';
 
 
 const reducers = combineReducers({
-    commonReducer
+    commonReducer,
+    loadingReducer
 })
 
 export default reducers

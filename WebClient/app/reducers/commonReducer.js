@@ -11,22 +11,23 @@ const initialAction = { type: 'initial state'}
 const common = (state = initialState, action = initialAction) => {
 
     switch (action.type) {
-        case constants.VIDEO_UPLOADED:
+        case constants.VIDEO_PROCESSED:
             return update(state, {
-                filePath: { $set: `${constants.API}${action.filePath}` },
-                isLoading: {$set: false}
+                filePath: { $set: `${constants.API}${action.filePath}` }
             });
-        case constants.TIME_STAMPS_RESEVED:
+        case constants.STAMPS_PROCESSED:
             return update(state, {
                 timeStamps: { $set: action.timeStamps }
             });
+        case constants.ALL_PROCESSED:
+            return update(state, {
+                timeStamps: { $set: action.timeStamps },
+                filePath: { $set: `${constants.API_FOR_FILE}${action.filePath.replace(/\\/g, "/")}` }
+            });
+
         case constants.SEEK_VIDEO:
             return update(state, {
                 timeSeek: { $set: action.time }
-            });
-        case constants.UPLOADING_STARTED:
-            return update(state, {
-                isLoading: { $set: true }
             });
 
         default:
