@@ -13,7 +13,7 @@ const common = (state = initialState, action = initialAction) => {
     switch (action.type) {
         case constants.VIDEO_PROCESSED:
             return update(state, {
-                filePath: { $set: `${constants.API}${action.filePath}` }
+                filePath: { $set: `${constants.API_FOR_FILE}${action.filePath}` }
             });
         case constants.STAMPS_PROCESSED:
             return update(state, {
@@ -22,7 +22,7 @@ const common = (state = initialState, action = initialAction) => {
         case constants.ALL_PROCESSED:
             return update(state, {
                 timeStamps: { $set: action.timeStamps },
-                filePath: { $set: `${constants.API_FOR_FILE}${action.filePath.replace(/\\/g, "/")}` }
+                filePath: { $set: `${constants.API_FOR_FILE}${action.filePath}` }
             });
 
         case constants.SEEK_VIDEO:

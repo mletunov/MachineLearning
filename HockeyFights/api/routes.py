@@ -1,6 +1,7 @@
 from api import app
 from datetime import datetime
 from flask.ext.cors import cross_origin
+from flask import send_from_directory
 
 
 
@@ -30,14 +31,15 @@ session = {}
 @ajax
 def api_upload():
     fileName = '{0}{1}{2}'.format('zz', ''.join(random.sample(char_set, 8)), '.mp4')
-    path = os.path.join('api', app.config['UPLOAD_FOLDER'], fileName)
+    path = os.path.join('web', app.config['UPLOAD_FOLDER'], fileName)
+    pathToUpload = 'video/' + fileName;
     
     file = flask.request.files['videoFile']
     file.save(path)
 
     session_id = ''.join(random.sample(char_set, 10))
     now = datetime.now()
-    session[session_id] = {'start': now, 'path': path}
+    session[session_id] = {'start': now, 'path': pathToUpload}
     return {'session': session_id}
 
 @app.route('/api/session/<id>')
@@ -56,7 +58,11 @@ def api_session(id):
     for count in range(40):
         stamps.append({
                 'fightStart': count % 2 == 0,
-                'timeStamp': count * 10 
+                'timeStamp': count * 10  
             })
 
     return {'video': session_info['path'], 'time': stamps}
+
+@app.route('/video/<path>')
+def send_js(path):
+    return send_from_directory(os.path.join('web', app.config['UPLOAD_FOLDER']), path)

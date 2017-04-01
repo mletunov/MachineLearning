@@ -3,6 +3,7 @@ import commonApi from '../api/common';
 import { browserHistory } from 'react-router';
 import {logSrv} from '../helpers';
 
+
 let actionsCreator = {
 
   videoPageOpened(){
