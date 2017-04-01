@@ -1,5 +1,6 @@
 ﻿import React from 'react';
 import { render } from 'react-dom';
+import 'jquery';
 import { Router, Route, browserHistory, IndexRoute} from 'react-router';
 import { Provider } from 'react-redux';
 import reduxStore from './store/reduxStore';
@@ -10,6 +11,8 @@ import videoPage from './components/videoPage';
 import 'bootstrap/dist/css/bootstrap.css';
 import "./assets/styles/site.css";
 import "video-react/dist/video-react.css";
+import "toastr/build/toastr.css";
+import 'toastr';
 
 render(
   <Provider store={reduxStore}>

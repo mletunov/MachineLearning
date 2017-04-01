@@ -35,6 +35,12 @@ const loading = (state = initialState, action = initialAction) => {
               stampsLoading: { $set: true },
               videoLoading: { $set: true }
           });
+          case constants.ON_ERROR:
+            return update(state, {
+                pageLoading: { $set: false },
+                stampsLoading: { $set: false },
+                videoLoading: { $set: false }
+            });
         default:
           return state;
     }

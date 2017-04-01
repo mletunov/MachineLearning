@@ -8,7 +8,7 @@ import flask, os
 import random
 import string
 import learning
-import jsonify
+
 
 def ajax(func):
     def wrapper(*args, **kwargs):

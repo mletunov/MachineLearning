@@ -1,6 +1,7 @@
 import constants from '../constants';
 import commonApi from '../api/common';
 import { browserHistory } from 'react-router';
+import {logSrv} from '../helpers';
 
 let actionsCreator = {
 
@@ -17,6 +18,11 @@ let actionsCreator = {
         commonApi.uploadFiles(files)
             .then((result) => {
                 browserHistory.push(`/deeplink/${result.body.session}`)
+            }).catch(() =>{
+              logSrv.Error();
+              dispatch({
+                type:constants.ON_ERROR
+              })
             })
     }
   },
@@ -50,6 +56,11 @@ let actionsCreator = {
                     } else {
                       setTimeout(function(){ callBack(dispatch);}, 2000);
                     }
+                  }).catch(() =>{
+                    logSrv.Error();
+                    dispatch({
+                      type:constants.ON_ERROR
+                    })
                   })
           };
 

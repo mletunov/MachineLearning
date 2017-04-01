@@ -53,6 +53,10 @@ module.exports = function (_path, NODE_ENV = "development") {
                 {
                     test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
                     loader: 'url-loader?limit=10000&mimetype=image/svg+xml'
+                },
+                {
+                  test: require.resolve("toastr"),
+                  loader: "imports-loader?jQuery=jquery,$=jquery,this=>window"
                 }
             ]
         },
@@ -66,7 +70,12 @@ module.exports = function (_path, NODE_ENV = "development") {
                 "process.env": {
                     NODE_ENV: JSON.stringify(NODE_ENV)
                 }
-            })
+            }),
+            new webpack.ProvidePlugin({
+              $: "jquery",
+              jQuery: "jquery",
+              toastr: "toastr"
+          })
         ]
     }
 }
