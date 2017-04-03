@@ -30,6 +30,9 @@
     <Compile Include="api\routes.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="api\tasks.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="dataset\HockeyDataset.py">
       <SubType>Code</SubType>
     </Compile>

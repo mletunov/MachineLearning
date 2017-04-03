@@ -1,14 +1,8 @@
 from api import app
-from datetime import datetime
-from flask.ext.cors import cross_origin
+from api import tasks
+from flask_cors import cross_origin
 from flask import send_from_directory
-
-
-
 import flask, os
-import random
-import string
-import learning
 
 
 def ajax(func):
@@ -23,46 +17,38 @@ def ajax(func):
     wrapper.__name__ = func.__name__
     return wrapper
 
-char_set = string.ascii_lowercase + string.digits
 session = {}
 
 @app.route('/api/upload', methods=["POST"])
 @cross_origin()
 @ajax
 def api_upload():
-    fileName = '{0}{1}{2}'.format('zz', ''.join(random.sample(char_set, 8)), '.mp4')
-    path = os.path.join('web', app.config['UPLOAD_FOLDER'], fileName)
-    pathToUpload = 'video/' + fileName;
-    
     file = flask.request.files['videoFile']
+    ext = os.path.splitext(file.filename)[-1].lower()
+    
+    fileName = '{0}{1}{2}'.format('zz', tasks.generate_name(8), ext) 
+    path = os.path.join(os.path.join('api', app.config['UPLOAD_FOLDER']), fileName)
     file.save(path)
 
-    session_id = ''.join(random.sample(char_set, 10))
-    now = datetime.now()
-    session[session_id] = {'start': now, 'path': pathToUpload}
-    return {'session': session_id}
+    session_id = tasks.generate_name(5)
+    session[session_id] = {'fileName': fileName}
+    return {'session': session_id}   
 
 @app.route('/api/session/<id>')
 @cross_origin()
 @ajax
 def api_session(id):
     session_info = session[id]
-    elapsed = (datetime.now() - session_info['start']).total_seconds()
-    if elapsed < 10:
-        return {'video': None, 'time': None}
-    
-    elif elapsed < 30:
+    if 'path' not in session_info:
+        tasks.save_mp4(session_info, os.path.join('api', app.config['UPLOAD_FOLDER']))
         return {'video': session_info['path'], 'time': None}
+    
+    elif 'time' not in session_info:
+        tasks.calc_times(session_info)
 
-    stamps = [];
-    for count in range(40):
-        stamps.append({
-                'fightStart': count % 2 == 0,
-                'timeStamp': count * 10  
-            })
-
-    return {'video': session_info['path'], 'time': stamps}
+    return {'video': session_info['path'], 'time': session_info['time']}
 
 @app.route('/video/<path>')
+@cross_origin()
 def send_js(path):
-    return send_from_directory(os.path.join('web', app.config['UPLOAD_FOLDER']), path)
+    return send_from_directory(app.config['UPLOAD_FOLDER'], path)
