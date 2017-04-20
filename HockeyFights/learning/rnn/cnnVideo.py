@@ -100,7 +100,7 @@ class CnnTrainer(baseNetwork.BaseTrainer):
                 if l2_loss:
                     loss = tf.nn.l2_loss(self.model.score - tf.one_hot(y, depth=self.model.num_classes))
                 else:
-                    loss = tf.nn.sparse_softmax_cross_entropy_with_logits(self.model.score, y)
+                    loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.model.score, labels=y)
 
                 total_loss = tf.reduce_mean(loss)
                 tf.summary.scalar("loss", total_loss)

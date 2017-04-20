@@ -61,7 +61,7 @@ class SimpleTrainer(baseNetwork.BaseTrainer):
                 tf.summary.scalar("accuracy", accuracy)
 
             with tf.name_scope("train"):
-                loss = tf.nn.sparse_softmax_cross_entropy_with_logits(self.model.score, y)
+                loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.model.score, labels=y)
                 total_loss = tf.reduce_mean(loss, name="loss")
                 tf.summary.scalar("loss", total_loss)
                 train_step = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(total_loss)
